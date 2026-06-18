@@ -11,12 +11,14 @@ import { Icon } from '../ui/Icon';
 import { DashboardSidebar } from './DashboardSidebar';
 import { DashboardTopBar } from './DashboardTopBar';
 
+import { ModeSelector } from '../quests/ModeSelector';
+import { MODE_CONFIG, type QuestMode } from '../../lib/quests/mode';
+
 import type { DashboardSummary, WorkloadSegment } from '../../types/dashboard';
 import type { TaskCategory } from '../../types/task';
 
-export type QuestMode = 'Normal' | 'Certs' | 'Exam';
-
 const emptySummary: DashboardSummary = {
+  heroName: '',
   level: 1,
   xp: 0,
   xpForNextLevel: 500,
@@ -190,31 +192,12 @@ function RetroCard({ children, borderColor = '#3f3d46', className = '' }: { chil
   );
 }
 
-function ModeBtn({ label, active, color, shadowColor, onClick }: { label: QuestMode; active: boolean; color: string; shadowColor: string; onClick: () => void }) {
-  return (
-    <button
-      aria-pressed={active}
-      className="min-h-[52px] flex-1 border-4 border-black py-3 text-base font-extrabold transition-all"
-      onClick={onClick}
-      style={{
-        backgroundColor: active ? color : '#1e1c24',
-        color: active ? '#0f0f13' : color,
-        boxShadow: active ? 'none' : `3px 3px 0px 0px ${shadowColor}`,
-        transform: active ? 'translate(3px, 3px)' : undefined,
-        outline: active ? `2px solid ${color}` : undefined
-      }}
-      type="button"
-    >
-      {label}
-    </button>
-  );
-}
-
 export function DashboardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showToast } = useToast();
   const [mode, setMode] = useState<QuestMode>('Normal');
+  const activeModeConfig = MODE_CONFIG.find((item) => item.label === mode) ?? MODE_CONFIG[0];
   const [summary, setSummary] = useState<DashboardSummary>(emptySummary);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -231,7 +214,7 @@ export function DashboardPage() {
 
     async function load() {
       try {
-        const { summary: fetched } = await getDashboardSummary();
+        const { summary: fetched } = await getDashboardSummary(mode === 'Normal' ? undefined : mode);
         if (!cancelled) setSummary(fetched);
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to load dashboard data.');
@@ -240,11 +223,12 @@ export function DashboardPage() {
       }
     }
 
+    setIsLoading(true);
     load();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [mode]);
 
   const handleLogout = async () => {
     try {
@@ -253,12 +237,6 @@ export function DashboardPage() {
       router.push('/login');
     }
   };
-
-  const modeConfig: { label: QuestMode; color: string; shadow: string }[] = [
-    { label: 'Normal', color: '#23d97e', shadow: '#065f46' },
-    { label: 'Certs', color: '#facc15', shadow: '#78350f' },
-    { label: 'Exam', color: '#f87171', shadow: '#7f1d1d' }
-  ];
 
   return (
     <div className="flex min-h-screen bg-[#0f0f13] text-[#e5e7eb]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -273,6 +251,9 @@ export function DashboardPage() {
         <main aria-label="Dashboard content" className="grid flex-1 grid-cols-1 gap-6 p-6 lg:grid-cols-3">
           <div className="flex flex-col gap-6 lg:col-span-2">
             <RetroCard borderColor="#a78bfa">
+              {summary.heroName ? (
+                <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[#a78bfa]">{summary.heroName}</p>
+              ) : null}
               <div className="flex items-center gap-4">
                 <span className="whitespace-nowrap text-lg font-extrabold text-white">Level {summary.level}</span>
                 <div className="flex-1">
@@ -299,9 +280,10 @@ export function DashboardPage() {
                 </div>
                 <div className="ml-auto">
                   <div
-                    className="border-4 border-black px-8 py-3 text-base font-bold"
-                    style={{ backgroundColor: '#23d97e', color: '#0d2e24', boxShadow: '3px 3px 0px 0px #065f46' }}
+                    className="flex items-center gap-2 border-4 border-black px-8 py-3 text-base font-bold"
+                    style={{ backgroundColor: activeModeConfig.color, color: '#0f0f13', boxShadow: `3px 3px 0px 0px ${activeModeConfig.shadow}` }}
                   >
+                    <Icon name={activeModeConfig.icon} className="h-5 w-5" />
                     {mode} Mode
                   </div>
                 </div>
@@ -318,34 +300,44 @@ export function DashboardPage() {
                     No priority quests yet — start a new quest to begin your adventure.
                   </p>
                 ) : (
-                  <ul className="divide-y divide-[#2a2733]">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {summary.priorityQuests.map((quest) => {
                       const dueLabel = formatDueIn(quest.dueDate);
+                      const priorityColor =
+                        quest.priority === 'High' ? '#f87171' : quest.priority === 'Medium' ? '#ffc640' : '#45dfa4';
                       return (
-                        <li key={quest.id} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
-                          <div className="flex items-center gap-3">
-                            <Icon
-                              name={quest.priority === 'High' ? 'priority_high' : 'assignment'}
-                              className="h-5 w-5 flex-shrink-0 text-[#a78bfa]"
-                            />
-                            <div>
-                              <p className="text-sm font-bold text-white">{quest.title}</p>
-                              <p className="text-xs text-gray-400">
-                                {quest.category} &middot; {quest.priority} priority
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex flex-col items-end gap-1 text-xs">
-                            <span className="flex items-center gap-1 font-bold text-[#facc15]">
-                              <Icon name="star" filled className="h-3.5 w-3.5" />
-                              {quest.xp} XP
+                        <div
+                          key={quest.id}
+                          className="flex flex-col gap-2 border-2 border-black bg-[#141219] p-3 shadow-[3px_3px_0px_0px_#000]"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="border border-[#a78bfa] bg-[#a78bfa]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#a78bfa]">
+                              {quest.category}
                             </span>
-                            {dueLabel ? <span className="text-gray-400">{dueLabel}</span> : null}
+                            <span className="flex items-center gap-1 text-[#facc15]">
+                              <Icon name="star" filled className="h-3.5 w-3.5" />
+                              <span className="text-xs font-bold">{quest.xp} XP</span>
+                            </span>
                           </div>
-                        </li>
+                          <p className="text-sm font-bold leading-tight text-white">{quest.title}</p>
+                          <div className="flex items-center justify-between">
+                            <span
+                              className="border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                              style={{ borderColor: priorityColor, color: priorityColor }}
+                            >
+                              {quest.priority}
+                            </span>
+                            {dueLabel ? (
+                              <span className="flex items-center gap-1 text-[10px] text-[#9ca3af]">
+                                <Icon name="schedule" className="h-3.5 w-3.5" />
+                                {dueLabel}
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
                       );
                     })}
-                  </ul>
+                  </div>
                 )}
               </RetroCard>
             </div>
@@ -353,18 +345,7 @@ export function DashboardPage() {
             <div>
               <h2 className="mb-3 text-lg font-extrabold text-white">Change Modes</h2>
               <RetroCard borderColor="#2a2733">
-                <div aria-label="Select quest mode" className="flex gap-4" role="group">
-                  {modeConfig.map((item) => (
-                    <ModeBtn
-                      key={item.label}
-                      active={mode === item.label}
-                      color={item.color}
-                      label={item.label}
-                      onClick={() => setMode(item.label)}
-                      shadowColor={item.shadow}
-                    />
-                  ))}
-                </div>
+                <ModeSelector mode={mode} onChange={setMode} />
               </RetroCard>
             </div>
           </div>
