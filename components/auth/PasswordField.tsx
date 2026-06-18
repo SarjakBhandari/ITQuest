@@ -29,7 +29,7 @@ export function PasswordField({ id, label, error, helperText, icon, wrapperClass
       endAdornment={
         <button
           aria-label={toggleLabel}
-          className="rounded-full border border-white/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.25em] text-white/60 transition hover:border-white/20 hover:text-white"
+          className="border-2 border-[#2a2733] bg-[#0f0f13] px-3 py-1 text-[11px] font-black uppercase tracking-[0.25em] text-[#9ca3af] transition-colors hover:border-[#a78bfa] hover:text-white"
           type="button"
           onClick={() => setVisible((current) => !current)}
         >

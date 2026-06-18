@@ -195,6 +195,22 @@ const icons: Record<string, IconRenderer> = {
       <polygon {...strokeProps} points="12 2 2 8 12 14 22 8 12 2" />
       <polyline {...strokeProps} points="2 14 12 20 22 14" />
     </>
+  ),
+  trophy: () => (
+    <>
+      <path {...strokeProps} d="M8 21h8" />
+      <path {...strokeProps} d="M12 17v4" />
+      <path {...strokeProps} d="M7 4h10v6a5 5 0 0 1-10 0z" />
+      <path {...strokeProps} d="M7 5H4a2 2 0 0 0 0 4h3" />
+      <path {...strokeProps} d="M17 5h3a2 2 0 0 1 0 4h-3" />
+    </>
+  ),
+  columns: () => (
+    <>
+      <rect {...strokeProps} x="3" y="4" width="6" height="16" rx="1" />
+      <rect {...strokeProps} x="9.5" y="4" width="6" height="10" rx="1" />
+      <rect {...strokeProps} x="16" y="4" width="6" height="13" rx="1" />
+    </>
   )
 };
 
