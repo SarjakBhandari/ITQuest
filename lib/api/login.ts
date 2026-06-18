@@ -1,32 +1,13 @@
-import { apiEndpoints } from '../../lib/api/endpoint';
+import { apiEndpoints } from './endpoint';
+import { apiRequest } from './http';
+import type { LoginRequestDto, LoginResponseDto } from '../../types/auth';
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  ok: boolean;
-  message: string;
-  user?: {
-    heroName: string;
-    email: string;
-  };
-}
+export type LoginRequest = LoginRequestDto;
+export type LoginResponse = LoginResponseDto;
 
 export async function login(request: LoginRequest): Promise<LoginResponse> {
-  const response = await fetch(apiEndpoints.login, {
+  return apiRequest<LoginResponse>(apiEndpoints.login, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
     body: JSON.stringify(request)
   });
-
-  const data = (await response.json()) as LoginResponse;
-  if (!response.ok) {
-    throw new Error(data.message || 'Unable to sign in');
-  }
-
-  return data;
 }

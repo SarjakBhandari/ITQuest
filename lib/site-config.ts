@@ -2,7 +2,7 @@ export const siteConfig = {
   name: process.env.NEXT_PUBLIC_SITE_NAME ?? 'IT Quest',
   tagline: process.env.NEXT_PUBLIC_SITE_TAGLINE ?? 'Level Up Your Workload',
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
-  apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000/api/auth',
+  apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5000/api',
   brandLogoUrl:
     process.env.NEXT_PUBLIC_BRAND_LOGO_URL ??
     'https://lh3.googleusercontent.com/aida-public/AB6AXuC-_wxnwop3bqfwULyAstIm9RxrqvfED6SfKribFWvzH8boE8qmFdNGpc29VFgVXGdr6rFKdSdhCumzgEfmx_WMES6VJyj5f5wU9QAhCWLpr9NuS1efMqm5qJiXHkXDHJn2EU-FXIJAg5i87gqiWu9oYGa_DdfFa7WXGaeeOwDEqkWQVDAnHt2wD1yiFW_ohElJJbyL5FofAKHkfJrJB8fLlXDgSXa-uj23GZBLaMsJjA-rD_xervdjdbwjAv3Iefn7QLIlWeKt9L4',

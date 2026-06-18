@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "jsonwebtoken": "^9.0.3",
     "next": "^16.2.6",
     "nodemailer": "^8.0.9",
     "react": "19.0.0",

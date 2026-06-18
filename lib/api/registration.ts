@@ -1,60 +1,29 @@
-import { apiEndpoints } from '../../lib/api/endpoint';
+import { apiEndpoints } from './endpoint';
+import { apiRequest } from './http';
+import type {
+  AuthResponseDto,
+  RegistrationOtpVerificationDto,
+  RegistrationVerificationResponseDto,
+  SignupRequestDto
+} from '../../types/auth';
 
-export interface RegistrationRequest {
-  heroName: string;
-  email: string;
-  password: string;
-}
-
-export interface RegistrationOtpVerificationRequest {
-  email: string;
-  code: string;
-}
-
-export interface RegistrationResponse {
-  ok: boolean;
-  message: string;
-}
-
-export interface RegistrationVerificationResponse extends RegistrationResponse {
-  user?: {
-    heroName: string;
-    email: string;
-  };
-}
+export type RegistrationRequest = SignupRequestDto;
+export type RegistrationOtpVerificationRequest = RegistrationOtpVerificationDto;
+export type RegistrationResponse = AuthResponseDto;
+export type RegistrationVerificationResponse = RegistrationVerificationResponseDto;
 
 export async function requestRegistrationOtp(request: RegistrationRequest): Promise<RegistrationResponse> {
-  const response = await fetch(apiEndpoints.registrationRequestOtp, {
+  return apiRequest<RegistrationResponse>(apiEndpoints.registrationRequestOtp, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
     body: JSON.stringify(request)
   });
-
-  const data = (await response.json()) as RegistrationResponse;
-  if (!response.ok) {
-    throw new Error(data.message || 'Unable to send OTP');
-  }
-
-  return data;
 }
 
 export async function verifyRegistrationOtp(
   request: RegistrationOtpVerificationRequest
 ): Promise<RegistrationVerificationResponse> {
-  const response = await fetch(apiEndpoints.registrationVerifyOtp, {
+  return apiRequest<RegistrationVerificationResponse>(apiEndpoints.registrationVerifyOtp, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
     body: JSON.stringify(request)
   });
-
-  const data = (await response.json()) as RegistrationVerificationResponse;
-  if (!response.ok) {
-    throw new Error(data.message || 'Unable to verify OTP');
-  }
-
-  return data;
 }

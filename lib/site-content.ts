@@ -83,17 +83,17 @@ export const authProviders: SocialButtonConfig[] = [
 ];
 
 export const otpDigits: OtpDigitConfig[] = [
-  { id: 'otp-1', value: '1' },
-  { id: 'otp-2', value: '1' },
-  { id: 'otp-3', value: '1' },
-  { id: 'otp-4', value: '1' },
-  { id: 'otp-5', value: '1' },
-  { id: 'otp-6', value: '1' }
+  { id: 'otp-1', value: '' },
+  { id: 'otp-2', value: '' },
+  { id: 'otp-3', value: '' },
+  { id: 'otp-4', value: '' },
+  { id: 'otp-5', value: '' },
+  { id: 'otp-6', value: '' }
 ];
 
 export const dashboardNavItems: DashboardNavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: 'dashboard', active: true },
-  { label: 'Quests', href: '#', icon: 'assignment' },
+  { label: 'Quests', href: '/quests', icon: 'assignment' },
   { label: 'Groups', href: '#', icon: 'group' },
   { label: 'Stats', href: '#', icon: 'bar_chart' }
 ];

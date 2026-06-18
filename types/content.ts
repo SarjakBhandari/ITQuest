@@ -1,4 +1,4 @@
-export type RoutePath = '/' | '/login' | '/signup' | '/otp-signup' | '/dashboard';
+export type RoutePath = '/' | '/login' | '/signup' | '/otp-signup' | '/dashboard' | '/quests';
 
 export type ButtonTone = 'purple' | 'green' | 'gray' | 'gold' | 'primary' | 'secondary' | 'danger' | 'dark';
 

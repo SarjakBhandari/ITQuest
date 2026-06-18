@@ -1,9 +1,13 @@
-import { siteConfig } from '../../lib/site-config';
+import { siteConfig } from '../site-config';
 
 const baseUrl = siteConfig.apiBaseUrl.replace(/\/$/, '');
 
 export const apiEndpoints = {
-  login: `${baseUrl}/login`,
-  registrationRequestOtp: `${baseUrl}/registration/request-otp`,
-  registrationVerifyOtp: `${baseUrl}/registration/verify-otp`
+  login: `${baseUrl}/auth/login`,
+  logout: `${baseUrl}/auth/logout`,
+  me: `${baseUrl}/auth/me`,
+  registrationRequestOtp: `${baseUrl}/auth/registration/request-otp`,
+  registrationVerifyOtp: `${baseUrl}/auth/registration/verify-otp`,
+  tasks: `${baseUrl}/tasks`,
+  task: (id: string) => `${baseUrl}/tasks/${id}`
 } as const;
