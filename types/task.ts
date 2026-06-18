@@ -8,10 +8,16 @@ export interface Task {
   description: string;
   category: TaskCategory;
   priority: TaskPriority;
+  hardness: number;
   xp: number;
+  note: string;
   dueDate: string | null;
   status: TaskStatus;
   order: number;
+  xpAwarded: boolean;
+  pausedAt: string | null;
+  snoozeCount: number;
+  isOverdue: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -26,16 +32,27 @@ export interface TaskResponse {
   ok: boolean;
   message: string;
   task: Task;
+  earlyBonus?: boolean;
+  bonusXp?: number;
+  cutXp?: number;
 }
 
 export interface CreateTaskInput {
   title: string;
   description?: string;
   category?: TaskCategory;
-  priority?: TaskPriority;
-  xp?: number;
-  dueDate?: string | null;
+  hardness: number;
+  days: number;
   status?: TaskStatus;
 }
 
-export type UpdateTaskInput = Partial<CreateTaskInput> & { order?: number };
+export interface UpdateTaskInput {
+  title?: string;
+  description?: string;
+  category?: TaskCategory;
+  hardness?: number;
+  days?: number;
+  note?: string;
+  status?: TaskStatus;
+  order?: number;
+}

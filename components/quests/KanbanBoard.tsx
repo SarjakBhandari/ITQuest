@@ -3,14 +3,21 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
-import { createTask, deleteTask, listTasks, updateTask } from '../../lib/api/tasks';
+import { createTask, deleteTask, listTasks, snoozeTask, updateTask } from '../../lib/api/tasks';
 import { Icon } from '../ui/Icon';
 import { RetroButton } from '../ui/RetroButton';
+import { useToast } from '../ui/ToastProvider';
 
+import { Confetti } from './Confetti';
+import { OverloadWarningModal } from './OverloadWarningModal';
+import { PauseQuestModal } from './PauseQuestModal';
+import { ResumeQuestModal } from './ResumeQuestModal';
 import { TaskCard } from './TaskCard';
 import { TaskFormModal } from './TaskFormModal';
 
 import type { CreateTaskInput, Task, TaskStatus } from '../../types/task';
+
+const ACTIVE_QUEST_LIMIT = 5;
 
 const columns: { status: TaskStatus; label: string; icon: string; accent: string }[] = [
   { status: 'backlog', label: 'Backlog', icon: 'inventory_2', accent: '#9ca3af' },
@@ -19,14 +26,26 @@ const columns: { status: TaskStatus; label: string; icon: string; accent: string
   { status: 'done', label: 'Done', icon: 'task_alt', accent: '#45dfa4' }
 ];
 
+const statusLabel: Record<TaskStatus, string> = {
+  backlog: 'Backlog',
+  'in-progress': 'In Progress',
+  rest: 'Rest',
+  done: 'Done'
+};
+
 export function KanbanBoard() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { showToast } = useToast();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [modalState, setModalState] = useState<{ task: Task | null; status: TaskStatus } | null>(null);
   const [deleteCandidate, setDeleteCandidate] = useState<Task | null>(null);
+  const [pauseCandidate, setPauseCandidate] = useState<Task | null>(null);
+  const [resumeCandidate, setResumeCandidate] = useState<{ task: Task; targetStatus: TaskStatus } | null>(null);
+  const [showOverloadWarning, setShowOverloadWarning] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [dragOverStatus, setDragOverStatus] = useState<TaskStatus | null>(null);
 
@@ -50,25 +69,6 @@ export function KanbanBoard() {
     };
   }, []);
 
-  useEffect(() => {
-    if (searchParams.get('new') === '1') {
-      setModalState({ task: null, status: 'backlog' });
-      router.replace('/quests');
-    }
-  }, [searchParams, router]);
-
-  useEffect(() => {
-    if (!deleteCandidate) return;
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setDeleteCandidate(null);
-      }
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [deleteCandidate]);
-
   const grouped = useMemo(() => {
     const map: Record<TaskStatus, Task[]> = { backlog: [], 'in-progress': [], rest: [], done: [] };
     for (const task of tasks) {
@@ -80,13 +80,29 @@ export function KanbanBoard() {
     return map;
   }, [tasks]);
 
+  const activeQuestCount = grouped['in-progress'].length;
+  const isOverloaded = activeQuestCount >= ACTIVE_QUEST_LIMIT;
+
+  useEffect(() => {
+    if (searchParams.get('new') !== '1') return;
+    router.replace('/quests');
+    if (isOverloaded) {
+      setShowOverloadWarning(true);
+    } else {
+      setModalState({ task: null, status: 'backlog' });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, router]);
+
   async function handleCreateOrUpdate(input: CreateTaskInput) {
     if (modalState?.task) {
       const { task } = await updateTask(modalState.task._id, input);
       setTasks((prev) => prev.map((item) => (item._id === task._id ? task : item)));
+      showToast(`"${task.title}" updated.`, 'success');
     } else {
       const { task } = await createTask(input);
       setTasks((prev) => [...prev, task]);
+      showToast(`"${task.title}" added to Backlog — worth ${task.xp} XP!`, 'success');
     }
     setModalState(null);
   }
@@ -96,9 +112,78 @@ export function KanbanBoard() {
     setTasks((prev) => prev.filter((item) => item._id !== task._id));
     try {
       await deleteTask(task._id);
+      showToast(`"${task.title}" deleted.`, 'info');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to delete quest.');
       setTasks((prev) => [...prev, task]);
+    }
+  }
+
+  async function completeTask(task: Task) {
+    try {
+      const { task: updated, earlyBonus, bonusXp } = await updateTask(task._id, { status: 'done' });
+      setTasks((prev) => prev.map((item) => (item._id === updated._id ? updated : item)));
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 2500);
+      if (earlyBonus) {
+        showToast(`Quest complete! +${updated.xp} XP plus a +${bonusXp} early-bird bonus!`, 'success');
+      } else {
+        showToast(`Quest complete! +${updated.xp} XP banked.`, 'success');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to complete quest.');
+    }
+  }
+
+  async function handleSnooze(task: Task) {
+    try {
+      const { task: updated, cutXp } = await snoozeTask(task._id);
+      setTasks((prev) => prev.map((item) => (item._id === updated._id ? updated : item)));
+      showToast(`"${task.title}" snoozed for 1 more day — -${cutXp} XP.`, 'info');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to snooze quest.');
+    }
+  }
+
+  async function confirmPause(note: string) {
+    if (!pauseCandidate) return;
+    const task = pauseCandidate;
+    try {
+      const { task: updated } = await updateTask(task._id, { status: 'rest', note });
+      setTasks((prev) => prev.map((item) => (item._id === updated._id ? updated : item)));
+      showToast(`"${task.title}" paused — resting until you're ready.`, 'info');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to pause quest.');
+    } finally {
+      setPauseCandidate(null);
+    }
+  }
+
+  async function confirmResume() {
+    if (!resumeCandidate) return;
+    const { task, targetStatus } = resumeCandidate;
+    try {
+      const { task: updated } = await updateTask(task._id, { status: targetStatus });
+      setTasks((prev) => prev.map((item) => (item._id === updated._id ? updated : item)));
+      showToast(`"${task.title}" resumed — back in action!`, 'success');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to resume quest.');
+    } finally {
+      setResumeCandidate(null);
+    }
+  }
+
+  async function moveTask(task: Task, status: TaskStatus) {
+    const targetOrder = grouped[status].length;
+    const previous = task;
+    setTasks((prev) => prev.map((item) => (item._id === task._id ? { ...item, status, order: targetOrder } : item)));
+
+    try {
+      await updateTask(task._id, { status, order: targetOrder });
+      showToast(`"${task.title}" moved to ${statusLabel[status]}.`, 'info');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to move quest.');
+      setTasks((prev) => prev.map((item) => (item._id === previous._id ? previous : item)));
     }
   }
 
@@ -110,22 +195,33 @@ export function KanbanBoard() {
     setDraggedTaskId(null);
     if (!task || task.status === status) return;
 
-    const targetOrder = grouped[status].length;
-    const previous = task;
-    setTasks((prev) =>
-      prev.map((item) => (item._id === task._id ? { ...item, status, order: targetOrder } : item))
-    );
-
-    try {
-      await updateTask(task._id, { status, order: targetOrder });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to move quest.');
-      setTasks((prev) => prev.map((item) => (item._id === previous._id ? previous : item)));
+    if (task.status === 'done') {
+      showToast("Completed quests can't be moved.", 'error');
+      return;
     }
+
+    if (status === 'rest') {
+      setPauseCandidate(task);
+      return;
+    }
+
+    if (task.status === 'rest') {
+      setResumeCandidate({ task, targetStatus: status });
+      return;
+    }
+
+    if (status === 'done') {
+      await completeTask(task);
+      return;
+    }
+
+    await moveTask(task, status);
   }
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
+      {showConfetti ? <Confetti /> : null}
+
       {error ? (
         <p className="border-b-2 border-[#f87171] bg-[#f87171]/10 px-6 py-2 text-sm text-[#fecaca]">{error}</p>
       ) : null}
@@ -160,6 +256,12 @@ export function KanbanBoard() {
                   <span className="ml-auto text-xs font-bold text-[#9ca3af]">{grouped[column.status].length}</span>
                 </div>
 
+                {column.status === 'in-progress' ? (
+                  <p className={`text-xs font-bold ${isOverloaded ? 'text-[#f87171]' : 'text-[#6b7280]'}`}>
+                    {activeQuestCount} / {ACTIVE_QUEST_LIMIT} active {isOverloaded ? '— overloaded!' : ''}
+                  </p>
+                ) : null}
+
                 <div
                   className={`flex flex-1 flex-col gap-4 overflow-y-auto rounded-sm p-1 transition-colors ${dragOverStatus === column.status ? 'bg-white/5' : ''}`}
                 >
@@ -178,6 +280,10 @@ export function KanbanBoard() {
                         }}
                         onEdit={() => setModalState({ task, status: task.status })}
                         onDelete={() => setDeleteCandidate(task)}
+                        onPause={() => setPauseCandidate(task)}
+                        onResume={() => setResumeCandidate({ task, targetStatus: 'in-progress' })}
+                        onComplete={() => completeTask(task)}
+                        onSnooze={() => handleSnooze(task)}
                       />
                     ))
                   )}
@@ -196,6 +302,25 @@ export function KanbanBoard() {
           onSubmit={handleCreateOrUpdate}
         />
       ) : null}
+
+      {pauseCandidate ? (
+        <PauseQuestModal
+          questTitle={pauseCandidate.title}
+          onClose={() => setPauseCandidate(null)}
+          onConfirm={confirmPause}
+        />
+      ) : null}
+
+      {resumeCandidate ? (
+        <ResumeQuestModal
+          questTitle={resumeCandidate.task.title}
+          note={resumeCandidate.task.note}
+          onClose={() => setResumeCandidate(null)}
+          onConfirm={confirmResume}
+        />
+      ) : null}
+
+      {showOverloadWarning ? <OverloadWarningModal onDismiss={() => setShowOverloadWarning(false)} /> : null}
 
       {deleteCandidate ? (
         <div

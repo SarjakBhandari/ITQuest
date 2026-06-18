@@ -16,6 +16,7 @@ export interface WorkloadSegment {
 }
 
 export interface DashboardSummary {
+  heroName: string;
   level: number;
   xp: number;
   xpForNextLevel: number;

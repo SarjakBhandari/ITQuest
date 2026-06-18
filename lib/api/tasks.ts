@@ -23,3 +23,7 @@ export async function updateTask(id: string, input: UpdateTaskInput): Promise<Ta
 export async function deleteTask(id: string): Promise<{ ok: boolean; message: string }> {
   return apiRequest(apiEndpoints.task(id), { method: 'DELETE' });
 }
+
+export async function snoozeTask(id: string): Promise<TaskResponse> {
+  return apiRequest<TaskResponse>(apiEndpoints.snoozeTask(id), { method: 'POST' });
+}

@@ -17,6 +17,7 @@ import type { TaskCategory } from '../../types/task';
 export type QuestMode = 'Normal' | 'Certs' | 'Exam';
 
 const emptySummary: DashboardSummary = {
+  heroName: '',
   level: 1,
   xp: 0,
   xpForNextLevel: 500,
@@ -231,7 +232,7 @@ export function DashboardPage() {
 
     async function load() {
       try {
-        const { summary: fetched } = await getDashboardSummary();
+        const { summary: fetched } = await getDashboardSummary(mode === 'Normal' ? undefined : mode);
         if (!cancelled) setSummary(fetched);
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to load dashboard data.');
@@ -240,11 +241,12 @@ export function DashboardPage() {
       }
     }
 
+    setIsLoading(true);
     load();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [mode]);
 
   const handleLogout = async () => {
     try {
@@ -273,6 +275,9 @@ export function DashboardPage() {
         <main aria-label="Dashboard content" className="grid flex-1 grid-cols-1 gap-6 p-6 lg:grid-cols-3">
           <div className="flex flex-col gap-6 lg:col-span-2">
             <RetroCard borderColor="#a78bfa">
+              {summary.heroName ? (
+                <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[#a78bfa]">{summary.heroName}</p>
+              ) : null}
               <div className="flex items-center gap-4">
                 <span className="whitespace-nowrap text-lg font-extrabold text-white">Level {summary.level}</span>
                 <div className="flex-1">
@@ -318,34 +323,44 @@ export function DashboardPage() {
                     No priority quests yet — start a new quest to begin your adventure.
                   </p>
                 ) : (
-                  <ul className="divide-y divide-[#2a2733]">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {summary.priorityQuests.map((quest) => {
                       const dueLabel = formatDueIn(quest.dueDate);
+                      const priorityColor =
+                        quest.priority === 'High' ? '#f87171' : quest.priority === 'Medium' ? '#ffc640' : '#45dfa4';
                       return (
-                        <li key={quest.id} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
-                          <div className="flex items-center gap-3">
-                            <Icon
-                              name={quest.priority === 'High' ? 'priority_high' : 'assignment'}
-                              className="h-5 w-5 flex-shrink-0 text-[#a78bfa]"
-                            />
-                            <div>
-                              <p className="text-sm font-bold text-white">{quest.title}</p>
-                              <p className="text-xs text-gray-400">
-                                {quest.category} &middot; {quest.priority} priority
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex flex-col items-end gap-1 text-xs">
-                            <span className="flex items-center gap-1 font-bold text-[#facc15]">
-                              <Icon name="star" filled className="h-3.5 w-3.5" />
-                              {quest.xp} XP
+                        <div
+                          key={quest.id}
+                          className="flex flex-col gap-2 border-2 border-black bg-[#141219] p-3 shadow-[3px_3px_0px_0px_#000]"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="border border-[#a78bfa] bg-[#a78bfa]/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#a78bfa]">
+                              {quest.category}
                             </span>
-                            {dueLabel ? <span className="text-gray-400">{dueLabel}</span> : null}
+                            <span className="flex items-center gap-1 text-[#facc15]">
+                              <Icon name="star" filled className="h-3.5 w-3.5" />
+                              <span className="text-xs font-bold">{quest.xp} XP</span>
+                            </span>
                           </div>
-                        </li>
+                          <p className="text-sm font-bold leading-tight text-white">{quest.title}</p>
+                          <div className="flex items-center justify-between">
+                            <span
+                              className="border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                              style={{ borderColor: priorityColor, color: priorityColor }}
+                            >
+                              {quest.priority}
+                            </span>
+                            {dueLabel ? (
+                              <span className="flex items-center gap-1 text-[10px] text-[#9ca3af]">
+                                <Icon name="schedule" className="h-3.5 w-3.5" />
+                                {dueLabel}
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
                       );
                     })}
-                  </ul>
+                  </div>
                 )}
               </RetroCard>
             </div>
