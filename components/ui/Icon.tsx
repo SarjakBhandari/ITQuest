@@ -47,6 +47,7 @@ const icons: Record<string, IconRenderer> = {
     </>
   ),
   play: () => <path fill="currentColor" d="M8 5v14l11-7z" />,
+  check: () => <path {...strokeProps} strokeWidth={4} d="M5 13l4 4L19 7" />,
   arrow_right: () => (
     <>
       <path {...strokeProps} d="M13 5l7 7-7 7" />
