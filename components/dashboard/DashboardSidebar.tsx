@@ -11,7 +11,7 @@ import { dashboardNavItems } from '../../lib/site-content';
 import { AppLogo } from '../../components/ui/AppLogo';
 import { RetroButton } from '../../components/ui/RetroButton';
 
-import { DashboardIcon } from '../../components/dashboard/DashboardIcon';
+import { Icon } from '../../components/ui/Icon';
 
 type DashboardSidebarProps = {
   onLogout?: () => void;
@@ -70,7 +70,7 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
       <div className="mb-5 border-2 border-black bg-[#141219] p-3 shadow-[3px_3px_0px_0px_#000]">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden border-2 border-black bg-[#a78bfa] text-[#1d1a21]">
-            <DashboardIcon filled name="person" />
+            <Icon filled name="person" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold text-[#e6e0ea]">{level !== null ? `Level ${level}` : 'Loading...'}</p>
@@ -96,7 +96,7 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
         onClick={handleNewQuest}
         type="button"
       >
-        <DashboardIcon name="add" />
+        <Icon name="add" />
         New Quest
       </RetroButton>
 
@@ -114,7 +114,7 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
               href={item.href}
               aria-current={isActive ? 'page' : undefined}
             >
-              <DashboardIcon name={item.icon} className="h-5 w-5 flex-shrink-0" />
+              <Icon name={item.icon} className="h-5 w-5 flex-shrink-0" />
               <span className="text-sm font-bold uppercase tracking-wide">{item.label}</span>
             </Link>
           );
@@ -127,7 +127,7 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
           onClick={handleLogout}
           type="button"
         >
-          <DashboardIcon name="logout" />
+          <Icon name="logout" />
           Log Out
         </RetroButton>
       </div>

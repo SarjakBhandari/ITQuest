@@ -5,8 +5,9 @@ import { useEffect, useState } from 'react';
 
 import { getDashboardSummary } from '../../lib/api/dashboard';
 import { logout } from '../../lib/api/auth';
+import { useToast } from '../ui/ToastProvider';
 
-import { DashboardIcon } from './DashboardIcon';
+import { Icon } from '../ui/Icon';
 import { DashboardSidebar } from './DashboardSidebar';
 import { DashboardTopBar } from './DashboardTopBar';
 
@@ -212,17 +213,18 @@ function ModeBtn({ label, active, color, shadowColor, onClick }: { label: QuestM
 export function DashboardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { showToast } = useToast();
   const [mode, setMode] = useState<QuestMode>('Normal');
-  const [showSuccess, setShowSuccess] = useState(false);
   const [summary, setSummary] = useState<DashboardSummary>(emptySummary);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (searchParams.get('welcome') === '1') {
-      setShowSuccess(true);
+      showToast('Login successful! Welcome back.', 'success');
+      router.replace('/dashboard');
     }
-  }, [searchParams]);
+  }, [searchParams, showToast, router]);
 
   useEffect(() => {
     let cancelled = false;
@@ -261,7 +263,7 @@ export function DashboardPage() {
   return (
     <div className="flex min-h-screen bg-[#0f0f13] text-[#e5e7eb]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <DashboardSidebar onLogout={handleLogout} />
-      <DashboardTopBar showSuccess={showSuccess} onDismissSuccess={() => setShowSuccess(false)} title="Dashboard" />
+      <DashboardTopBar title="Dashboard" />
 
       <div className="ml-[240px] flex flex-1 flex-col overflow-auto pt-24">
         {error ? (
@@ -322,7 +324,7 @@ export function DashboardPage() {
                       return (
                         <li key={quest.id} className="flex items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
                           <div className="flex items-center gap-3">
-                            <DashboardIcon
+                            <Icon
                               name={quest.priority === 'High' ? 'priority_high' : 'assignment'}
                               className="h-5 w-5 flex-shrink-0 text-[#a78bfa]"
                             />
@@ -335,7 +337,7 @@ export function DashboardPage() {
                           </div>
                           <div className="flex flex-col items-end gap-1 text-xs">
                             <span className="flex items-center gap-1 font-bold text-[#facc15]">
-                              <DashboardIcon name="star" filled className="h-3.5 w-3.5" />
+                              <Icon name="star" filled className="h-3.5 w-3.5" />
                               {quest.xp} XP
                             </span>
                             {dueLabel ? <span className="text-gray-400">{dueLabel}</span> : null}
