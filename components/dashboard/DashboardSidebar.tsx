@@ -28,20 +28,25 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
   useEffect(() => {
     let cancelled = false;
 
-    getDashboardSummary()
-      .then(({ summary }) => {
-        if (cancelled) return;
-        setHeroName(summary.heroName);
-        setLevel(summary.level);
-        setXp(summary.xp);
-        setXpForNextLevel(summary.xpForNextLevel);
-      })
-      .catch(() => {
-        /* sidebar still renders without level info */
-      });
+    function refresh() {
+      getDashboardSummary()
+        .then(({ summary }) => {
+          if (cancelled) return;
+          setHeroName(summary.heroName);
+          setLevel(summary.level);
+          setXp(summary.xp);
+          setXpForNextLevel(summary.xpForNextLevel);
+        })
+        .catch(() => {
+          /* sidebar still renders without level info */
+        });
+    }
 
+    refresh();
+    window.addEventListener('itquest:xp-updated', refresh);
     return () => {
       cancelled = true;
+      window.removeEventListener('itquest:xp-updated', refresh);
     };
   }, []);
 
