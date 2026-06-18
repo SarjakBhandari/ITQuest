@@ -1,4 +1,4 @@
-type DashboardIconProps = {
+type IconProps = {
   name: string;
   filled?: boolean;
   className?: string;
@@ -27,6 +27,31 @@ const icons: Record<string, IconRenderer> = {
         <circle {...strokeProps} cx="12" cy="7" r="4" />
       </>
     ),
+  user: () => (
+    <>
+      <path {...strokeProps} d="M20 21a8 8 0 1 0-16 0" />
+      <circle {...strokeProps} cx="12" cy="7" r="4" />
+    </>
+  ),
+  mail: () => (
+    <>
+      <path {...strokeProps} d="M4 6h16v12H4z" />
+      <path {...strokeProps} d="m4 7 8 6 8-6" />
+    </>
+  ),
+  lock: () => (
+    <>
+      <path {...strokeProps} d="M7 11V8a5 5 0 1 1 10 0v3" />
+      <path {...strokeProps} d="M5 11h14v10H5z" />
+    </>
+  ),
+  play: () => <path fill="currentColor" d="M8 5v14l11-7z" />,
+  arrow_right: () => (
+    <>
+      <path {...strokeProps} d="M13 5l7 7-7 7" />
+      <path {...strokeProps} d="M20 12H4" />
+    </>
+  ),
   add: () => (
     <>
       <line {...strokeProps} x1="12" y1="5" x2="12" y2="19" />
@@ -158,12 +183,24 @@ const icons: Record<string, IconRenderer> = {
       <line {...strokeProps} x1="12" y1="4" x2="12" y2="14" />
       <line {...strokeProps} x1="12" y1="19" x2="12.01" y2="19" />
     </>
+  ),
+  shield: () => (
+    <>
+      <path {...strokeProps} d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path {...strokeProps} d="M9 12l2 2 4-4" />
+    </>
+  ),
+  layers: () => (
+    <>
+      <polygon {...strokeProps} points="12 2 2 8 12 14 22 8 12 2" />
+      <polyline {...strokeProps} points="2 14 12 20 22 14" />
+    </>
   )
 };
 
 const fallbackIcon: IconRenderer = () => <circle {...strokeProps} cx="12" cy="12" r="9" />;
 
-export function DashboardIcon({ name, filled = false, className }: DashboardIconProps) {
+export function Icon({ name, filled = false, className }: IconProps) {
   const render = icons[name] ?? fallbackIcon;
 
   return (

@@ -58,112 +58,25 @@ a {
   letter-spacing: 0.025em;
 }
 
-.shadow-purple-retro {
-  box-shadow: 0px 6px 0px 0px #312e81;
-}
-
-.shadow-purple-retro:active {
-  transform: translateY(4px);
-  box-shadow: 0px 2px 0px 0px #312e81;
-}
-
-.shadow-green-retro {
-  box-shadow: 0px 6px 0px 0px #065f46;
-}
-
-.shadow-green-retro:active {
-  transform: translateY(4px);
-  box-shadow: 0px 2px 0px 0px #065f46;
-}
-
-.shadow-gray-retro {
-  box-shadow: 0px 6px 0px 0px #111827;
-}
-
-.shadow-gray-retro:active {
-  transform: translateY(4px);
-  box-shadow: 0px 2px 0px 0px #111827;
-}
-
-.logo-frame {
-  border: 4px solid #000000;
-  box-shadow: 6px 6px 0px 0px #7c3aed;
-}
-
-.retro-border {
-  border: 3px solid #b191ff;
-  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.8);
-}
-
-.retro-input {
-  background-color: #0c0a0f;
-  border: 2px solid #2d2638;
-  transition: border-color 0.2s;
-}
-
-.retro-input:focus-within {
-  border-color: #b191ff;
-  outline: none;
-}
-
-.btn-primary-retro {
-  background-color: #a582ff;
-  border: 3px solid #2d2638;
-  box-shadow: 0px 4px 0px 0px #6b46c1;
-  transition: all 0.1s ease;
-}
-
-.btn-primary-retro:active {
-  transform: translateY(2px);
-  box-shadow: 0px 2px 0px 0px #6b46c1;
-}
-
-.btn-social-retro {
-  background-color: #1a1622;
-  border: 2px solid #2d2638;
-  box-shadow: 0px 3px 0px 0px #000;
-}
-
-.btn-social-retro:hover {
-  background-color: #241e2e;
-}
-
-.shadow-retro {
-  box-shadow: 4px 4px 0px 0px #000000;
-}
-
-.shadow-retro-lg {
-  box-shadow: 6px 6px 0px 0px #000000;
-}
-
-.shadow-retro-sharp {
-  box-shadow: 4px 4px 0px 0px #000000;
-}
-
-.shadow-retro-sharp-lg {
-  box-shadow: 8px 8px 0px 0px #000000;
-}
-
-.brutalist-card {
-  border: 4px solid #000000;
-  box-shadow: 4px 4px 0px 0px #000000;
-}
-
-.brutalist-button {
-  border: 2px solid #000000;
-  box-shadow: 4px 4px 0px 0px #000000;
-  transition: all 0.1s ease;
-}
-
-.brutalist-button:active {
-  transform: translate(2px, 2px);
-  box-shadow: 0px 0px 0px 0px #000000;
-}
-
 .active-nav {
   background-color: #cebdff;
   color: #381385;
   border: 2px solid #000000;
   box-shadow: 4px 4px 0px 0px #000000;
   font-weight: 700;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.toast-enter {
+  animation: toast-in 0.2s ease-out;
 }

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import './globals.css';
 
 import { siteConfig } from '../lib/site-config';
+import { ToastProvider } from '../components/ui/ToastProvider';
 
 export const metadata: Metadata = {
   title: {
@@ -16,7 +17,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen text-white antialiased">{children}</body>
+      <body className="min-h-screen text-white antialiased">
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
   );
 }

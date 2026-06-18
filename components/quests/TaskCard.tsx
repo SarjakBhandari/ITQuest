@@ -1,6 +1,6 @@
 'use client';
 
-import { DashboardIcon } from '../dashboard/DashboardIcon';
+import { Icon } from '../ui/Icon';
 
 import type { Task } from '../../types/task';
 
@@ -43,7 +43,7 @@ export function TaskCard({ task, onEdit, onDelete, onDragStart }: TaskCardProps)
           {task.category}
         </span>
         <span className="flex items-center gap-1 text-[#facc15]">
-          <DashboardIcon name="star" filled className="h-3.5 w-3.5" />
+          <Icon name="star" filled className="h-3.5 w-3.5" />
           <span className="text-xs font-bold">{task.xp} XP</span>
         </span>
       </div>
@@ -54,7 +54,7 @@ export function TaskCard({ task, onEdit, onDelete, onDragStart }: TaskCardProps)
       <div className="flex items-center justify-between">
         {isDone ? (
           <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-[#45dfa4]">
-            <DashboardIcon name="verified" className="h-4 w-4" />
+            <Icon name="verified" className="h-4 w-4" />
             Completed
           </span>
         ) : (
@@ -68,7 +68,7 @@ export function TaskCard({ task, onEdit, onDelete, onDragStart }: TaskCardProps)
 
         {dueLabel && !isDone ? (
           <span className="flex items-center gap-1 text-[10px] text-[#9ca3af]">
-            <DashboardIcon name="schedule" className="h-3.5 w-3.5" />
+            <Icon name="schedule" className="h-3.5 w-3.5" />
             {dueLabel}
           </span>
         ) : null}
@@ -81,7 +81,7 @@ export function TaskCard({ task, onEdit, onDelete, onDragStart }: TaskCardProps)
           onClick={onEdit}
           type="button"
         >
-          <DashboardIcon name="edit" className="h-4 w-4" />
+          <Icon name="edit" className="h-4 w-4" />
         </button>
         <button
           aria-label={`Delete ${task.title}`}
@@ -89,7 +89,7 @@ export function TaskCard({ task, onEdit, onDelete, onDragStart }: TaskCardProps)
           onClick={onDelete}
           type="button"
         >
-          <DashboardIcon name="delete" className="h-4 w-4" />
+          <Icon name="delete" className="h-4 w-4" />
         </button>
       </div>
     </div>
