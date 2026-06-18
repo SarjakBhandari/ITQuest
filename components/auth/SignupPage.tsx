@@ -9,6 +9,7 @@ import { requestRegistrationOtp } from '../../lib/api/registration';
 import { AuthPageLayout, AuthShell } from './AuthShell';
 import { AuthFormField } from './AuthFormField';
 import { PasswordField } from './PasswordField';
+import { Icon } from '../ui/Icon';
 import { RetroButton } from '../ui/RetroButton';
 
 type SignupFormValues = {
@@ -17,33 +18,6 @@ type SignupFormValues = {
   password: string;
   confirmPassword: string;
 };
-
-function UserIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path d="M20 21a8 8 0 1 0-16 0" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-      <circle cx="12" cy="7" r="4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-    </svg>
-  );
-}
-
-function MailIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path d="M4 6h16v12H4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-      <path d="m4 7 8 6 8-6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path d="M7 11V8a5 5 0 1 1 10 0v3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-      <path d="M5 11h14v10H5z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-    </svg>
-  );
-}
 
 export function SignupPage() {
   const router = useRouter();
@@ -97,7 +71,7 @@ export function SignupPage() {
             label="Hero Name"
             placeholder="QuestMaster"
             autoComplete="nickname"
-            icon={<UserIcon />}
+            icon={<Icon name="user" />}
             error={errors.heroName?.message}
             {...register('heroName', {
               required: 'Hero Name is required.',
@@ -112,7 +86,7 @@ export function SignupPage() {
             placeholder="wizard@quest.com"
             autoComplete="email"
             inputMode="email"
-            icon={<MailIcon />}
+            icon={<Icon name="mail" />}
             error={errors.email?.message}
             {...register('email', {
               required: 'Email is required.',
@@ -128,7 +102,7 @@ export function SignupPage() {
             label="Password"
             placeholder="••••••••"
             autoComplete="new-password"
-            icon={<LockIcon />}
+            icon={<Icon name="lock" />}
             helperText="At least 8 characters with a letter."
             error={errors.password?.message}
             {...register('password', {
@@ -143,7 +117,7 @@ export function SignupPage() {
             label="Confirm Password"
             placeholder="••••••••"
             autoComplete="new-password"
-            icon={<LockIcon />}
+            icon={<Icon name="lock" />}
             error={errors.confirmPassword?.message}
             {...register('confirmPassword', {
               required: 'Confirm password is required.',

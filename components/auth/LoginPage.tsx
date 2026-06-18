@@ -9,30 +9,13 @@ import { login } from '../../lib/api/login';
 import { AuthPageLayout, AuthShell } from './AuthShell';
 import { AuthFormField } from './AuthFormField';
 import { PasswordField } from './PasswordField';
+import { Icon } from '../ui/Icon';
 import { RetroButton } from '../ui/RetroButton';
 
 type LoginFormValues = {
   email: string;
   password: string;
 };
-
-function MailIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path d="M4 6h16v12H4z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-      <path d="m4 7 8 6 8-6" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path d="M7 11V8a5 5 0 1 1 10 0v3" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-      <path d="M5 11h14v10H5z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
-    </svg>
-  );
-}
 
 export function LoginPage() {
   const router = useRouter();
@@ -80,7 +63,7 @@ export function LoginPage() {
             placeholder="wizard@quest.com"
             autoComplete="email"
             inputMode="email"
-            icon={<MailIcon />}
+            icon={<Icon name="mail" />}
             error={errors.email?.message}
             {...register('email', {
               required: 'Email is required.',
@@ -96,7 +79,7 @@ export function LoginPage() {
             label="Password"
             placeholder="••••••••"
             autoComplete="current-password"
-            icon={<LockIcon />}
+            icon={<Icon name="lock" />}
             error={errors.password?.message}
             {...register('password', {
               required: 'Password is required.',
@@ -109,7 +92,7 @@ export function LoginPage() {
           ) : null}
 
           <RetroButton
-            className="w-full justify-center border-4 border-black bg-[#a78bfa] text-base font-black text-black shadow-[4px_4px_0px_0px_#000] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:opacity-70"
+            className="w-full justify-center border-4 border-black bg-[#a78bfa] text-base font-black text-[#1d1a21] shadow-[4px_4px_0px_0px_#000] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:opacity-70"
             disabled={isSubmitting}
             type="submit"
           >
