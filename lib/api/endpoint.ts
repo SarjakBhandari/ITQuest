@@ -9,5 +9,6 @@ export const apiEndpoints = {
   registrationRequestOtp: `${baseUrl}/auth/registration/request-otp`,
   registrationVerifyOtp: `${baseUrl}/auth/registration/verify-otp`,
   tasks: `${baseUrl}/tasks`,
-  task: (id: string) => `${baseUrl}/tasks/${id}`
+  task: (id: string) => `${baseUrl}/tasks/${id}`,
+  dashboardSummary: `${baseUrl}/dashboard/summary`
 } as const;

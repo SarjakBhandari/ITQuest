@@ -1,3 +1,10 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+import { getDashboardSummary } from '../../lib/api/dashboard';
 import { siteConfig } from '../../lib/site-config';
 import { dashboardNavItems } from '../../lib/site-content';
 
@@ -6,42 +13,120 @@ import { RetroButton } from '../../components/ui/RetroButton';
 
 import { DashboardIcon } from '../../components/dashboard/DashboardIcon';
 
-export function DashboardSidebar() {
+type DashboardSidebarProps = {
+  onLogout?: () => void;
+};
+
+export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const [level, setLevel] = useState<number | null>(null);
+  const [xp, setXp] = useState(0);
+  const [xpForNextLevel, setXpForNextLevel] = useState(500);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getDashboardSummary()
+      .then(({ summary }) => {
+        if (cancelled) return;
+        setLevel(summary.level);
+        setXp(summary.xp);
+        setXpForNextLevel(summary.xpForNextLevel);
+      })
+      .catch(() => {
+        /* sidebar still renders without level info */
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+      return;
+    }
+    router.push('/login');
+  };
+
+  const handleNewQuest = () => {
+    router.push('/quests?new=1');
+  };
+
+  const xpPct = Math.min((xp / xpForNextLevel) * 100, 100);
+
   return (
-    <aside className="fixed left-0 top-0 z-50 flex h-full w-[240px] flex-col border-r-4 border-black bg-[#1d1a21]/95 p-4 shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] backdrop-blur-sm">
-      <div className="mb-8">
-        <AppLogo alt={`${siteConfig.name} logo`} className="logo-frame mb-4 bg-white p-1 rounded-sm" sizeClassName="w-20 h-20" />
-        <h1 className="text-3xl font-black tracking-tighter text-[#ffc640]">{siteConfig.name}</h1>
-        <div className="mt-2 flex items-center gap-3">
-          <div className="w-10 h-10 overflow-hidden border-2 border-black bg-[#a78bfa]">
-            <img alt="Hero Avatar" className="w-full h-full object-cover" src={siteConfig.dashboardHeroAvatarUrl} />
-          </div>
-          <div>
-            <p className="text-sm font-bold text-[#e6e0ea]">Level 12</p>
-            <p className="text-[10px] text-[#cac4d4] uppercase">Coding Squire</p>
-          </div>
+    <aside className="fixed left-0 top-0 z-50 flex h-full w-[240px] flex-col overflow-y-auto border-r-4 border-black bg-[#1d1a21]/95 p-4 shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] backdrop-blur-sm">
+      <div className="mb-5 flex items-center gap-2.5 border-b-2 border-[#2a2733] pb-5">
+        <AppLogo alt={`${siteConfig.name} logo`} className="border-2 border-black bg-white" sizeClassName="h-9 w-9" />
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-black leading-tight tracking-tight text-[#ffc640]">{siteConfig.name}</h1>
+          <p className="truncate text-[10px] uppercase tracking-widest text-[#6b7280]">{siteConfig.tagline}</p>
         </div>
       </div>
 
-      <nav className="flex flex-1 flex-col gap-2">
-        {dashboardNavItems.map((item) => (
-          <a
-            key={item.label}
-            className={`flex items-center gap-3 rounded-md p-3 transition-all ${item.active ? 'active-nav group' : 'text-[#cac4d4] hover:bg-[#2b2930]'}`}
-            href={item.href}
-          >
-            <DashboardIcon name={item.icon} />
-            <span className="text-sm font-bold uppercase tracking-wide">{item.label}</span>
-          </a>
-        ))}
+      <div className="mb-5 border-2 border-black bg-[#141219] p-3 shadow-[3px_3px_0px_0px_#000]">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden border-2 border-black bg-[#a78bfa] text-[#1d1a21]">
+            <DashboardIcon filled name="person" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-bold text-[#e6e0ea]">{level !== null ? `Level ${level}` : 'Loading...'}</p>
+            <p className="text-[10px] uppercase tracking-wide text-[#cac4d4]">
+              {xp} / {xpForNextLevel} XP
+            </p>
+          </div>
+        </div>
+        <div
+          className="mt-3 h-1.5 w-full overflow-hidden border border-black bg-[#0f0f13]"
+          role="progressbar"
+          aria-label="XP progress to next level"
+          aria-valuenow={xp}
+          aria-valuemin={0}
+          aria-valuemax={xpForNextLevel}
+        >
+          <div className="h-full bg-[#23d97e] transition-all duration-500" style={{ width: `${xpPct}%` }} />
+        </div>
+      </div>
+
+      <RetroButton
+        className="mb-5 w-full justify-center bg-[#ffc640] font-bold uppercase tracking-wider text-[#261a00]"
+        onClick={handleNewQuest}
+        type="button"
+      >
+        <DashboardIcon name="add" />
+        New Quest
+      </RetroButton>
+
+      <nav className="flex flex-1 flex-col gap-1.5" aria-label="Main navigation">
+        {dashboardNavItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.label}
+              className={`flex items-center gap-3 rounded-md border-2 p-3 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#a78bfa] ${
+                isActive
+                  ? 'border-black bg-[#cebdff] text-[#381385] shadow-[3px_3px_0px_0px_#000]'
+                  : 'border-transparent text-[#cac4d4] hover:border-[#2a2733] hover:bg-[#2b2930]'
+              }`}
+              href={item.href}
+              aria-current={isActive ? 'page' : undefined}
+            >
+              <DashboardIcon name={item.icon} className="h-5 w-5 flex-shrink-0" />
+              <span className="text-sm font-bold uppercase tracking-wide">{item.label}</span>
+            </Link>
+          );
+        })}
       </nav>
 
-      <div className="mt-auto flex flex-col gap-4">
-        <RetroButton className="w-full justify-center bg-[#ffc640] font-bold uppercase tracking-wider text-[#261a00]">
-          <DashboardIcon name="add" />
-          New Quest
-        </RetroButton>
-        <RetroButton className="w-full justify-center bg-[#ffb4ab] font-bold uppercase tracking-wider text-[#690005]">
+      <div className="mt-4 border-t-2 border-[#2a2733] pt-4">
+        <RetroButton
+          className="w-full justify-center bg-[#ffb4ab] font-bold uppercase tracking-wider text-[#690005]"
+          onClick={handleLogout}
+          type="button"
+        >
           <DashboardIcon name="logout" />
           Log Out
         </RetroButton>

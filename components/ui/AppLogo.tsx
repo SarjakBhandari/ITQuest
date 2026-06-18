@@ -1,6 +1,6 @@
 import Image, { type StaticImageData } from 'next/image';
 
-import logo from '../../logo.png';
+import logo from '@/public/logo.png';
 
 type AppLogoProps = {
   alt?: string;

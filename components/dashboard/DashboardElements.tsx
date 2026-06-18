@@ -1,39 +1,82 @@
+'use client';
+
+import type { QuestMode } from '../../components/dashboard/DashboardPage';
 import { DashboardIcon } from '../../components/dashboard/DashboardIcon';
 import { BrutalistCard } from '../../components/ui/BrutalistCard';
 import { RetroButton } from '../../components/ui/RetroButton';
 
-export function DashboardProgressCard() {
+type DashboardProgressCardProps = {
+  currentXp: number;
+  maxXp: number;
+  streak: number;
+  freezesAvailable: number;
+  mode: QuestMode;
+};
+
+const modeStyles: Record<QuestMode, { bg: string; text: string }> = {
+  Normal: { bg: 'bg-[#45dfa4]', text: 'text-[#003825]' },
+  Certs: { bg: 'bg-[#ffc640]', text: 'text-[#261a00]' },
+  Exam: { bg: 'bg-[#ffb4ab]', text: 'text-[#690005]' }
+};
+
+function xpProgressPct(current: number, max: number) {
+  return Math.min((current / max) * 100, 100);
+}
+
+function levelFromXp(current: number, max: number) {
+  return Math.floor((current / max) * 10) + 1;
+}
+
+export function DashboardProgressCard({ currentXp, maxXp, streak, freezesAvailable, mode }: DashboardProgressCardProps) {
+  const pct = xpProgressPct(currentXp, maxXp);
+  const level = levelFromXp(currentXp, maxXp);
+  const modeStyle = modeStyles[mode];
+
   return (
     <section className="brutalist-card flex flex-col gap-6 bg-[#211e25] p-6 sm:p-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <span className="text-2xl font-bold text-[#cebdff]">Level 1</span>
+        <span className="text-2xl font-bold text-[#cebdff]">Level {level}</span>
         <div className="flex flex-1 flex-col items-center">
-          <div className="relative h-8 w-full max-w-xl overflow-hidden border-2 border-black bg-[#36343b]">
-            <div className="h-full bg-[#45dfa4] w-[15%]" style={{ boxShadow: 'inset -4px 0 0 rgba(0,0,0,0.2)' }} />
+          <div
+            className="relative h-8 w-full max-w-xl overflow-hidden border-2 border-black bg-[#36343b]"
+            role="progressbar"
+            aria-valuenow={currentXp}
+            aria-valuemin={0}
+            aria-valuemax={maxXp}
+            aria-label={`${currentXp} of ${maxXp} XP`}
+          >
+            <div
+              className="h-full bg-[#45dfa4] transition-all duration-500"
+              style={{ width: `${pct}%`, boxShadow: 'inset -4px 0 0 rgba(0,0,0,0.2)' }}
+            />
           </div>
-          <span className="text-sm font-bold text-[#ffc640] mt-1">50 / 5,000 XP</span>
+          <span className="mt-1 text-sm font-bold text-[#ffc640]">
+            {currentXp.toLocaleString()} / {maxXp.toLocaleString()} XP
+          </span>
         </div>
-        <span className="text-2xl font-bold text-[#cebdff]">Level 2</span>
+        <span className="text-2xl font-bold text-[#cebdff]">Level {level + 1}</span>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
         <div className="flex items-center gap-6">
-          <BrutalistCard className="flex h-24 w-24 items-center justify-center bg-[#ffc640]">
-            <span className="text-5xl font-black text-black">1</span>
+          <BrutalistCard className="flex h-24 w-24 items-center justify-center bg-[#ffc640]" aria-label={`${streak} day streak`}>
+            <span className="text-5xl font-black text-black">{streak}</span>
           </BrutalistCard>
           <div className="flex flex-col">
-            <span className="flex items-center gap-2 font-bold text-[#ffc640] uppercase">
+            <span className="flex items-center gap-2 font-bold uppercase text-[#ffc640]">
               <DashboardIcon filled name="local_fire_department" />
               Streak
             </span>
           </div>
         </div>
         <div className="flex flex-col items-center justify-center gap-3 md:items-end">
-          <span className="flex items-center gap-2 font-bold text-[#45dfa4] uppercase">
+          <span className="flex items-center gap-2 font-bold uppercase text-[#45dfa4]">
             <DashboardIcon name="ac_unit" />
-            2 Freeze Available
+            {freezesAvailable} Freeze Available
           </span>
-          <RetroButton className="bg-[#45dfa4] text-[#003825] px-12 py-2 font-bold uppercase tracking-widest">Normal Mode</RetroButton>
+          <RetroButton className={`${modeStyle.bg} ${modeStyle.text} px-12 py-2 font-bold uppercase tracking-widest`}>
+            {mode} Mode
+          </RetroButton>
         </div>
       </div>
     </section>
@@ -45,86 +88,154 @@ export function DashboardSectionTitle({ title }: { title: string }) {
 }
 
 export function DashboardSectionDivider() {
-  return <div className="h-1 flex-1 mx-4 bg-[#36343b] border-b-2 border-black" />;
+  return <div className="mx-4 h-1 flex-1 border-b-2 border-black bg-[#36343b]" />;
 }
 
 export function DashboardPlaceholder() {
   return (
-    <div className="grid h-64 grid-cols-1 place-items-center gap-4 border-4 border-dashed border-[#494552] opacity-60">
-      <p className="text-center text-sm font-bold uppercase tracking-widest text-[#cac4d4]">No active priority quests</p>
+    <BrutalistCard className="grid h-64 place-items-center bg-[#211e25] p-6">
+      <p className="text-center text-sm text-[#cac4d4]">
+        No priority quests yet — start a new quest to begin your adventure.
+      </p>
+    </BrutalistCard>
+  );
+}
+
+type DashboardModeButtonsProps = {
+  activeMode: QuestMode;
+  onModeChange: (mode: QuestMode) => void;
+};
+
+const modeButtons: { label: QuestMode; className: string }[] = [
+  { label: 'Normal', className: 'bg-[#45dfa4] text-[#003825]' },
+  { label: 'Certs', className: 'bg-[#ffc640] text-[#261a00]' },
+  { label: 'Exam', className: 'bg-[#ffb4ab] text-[#690005]' }
+];
+
+export function DashboardModeButtons({ activeMode, onModeChange }: DashboardModeButtonsProps) {
+  return (
+    <div className="brutalist-card flex flex-wrap gap-4 bg-[#211e25] p-6" role="group" aria-label="Select quest mode">
+      {modeButtons.map((item) => {
+        const isActive = activeMode === item.label;
+        return (
+          <RetroButton
+            key={item.label}
+            aria-pressed={isActive}
+            className={`min-w-[120px] flex-1 justify-center font-black uppercase transition-all ${
+              isActive ? item.className : 'bg-[#1e1c24] text-[#cac4d4]'
+            }`}
+            onClick={() => onModeChange(item.label)}
+            style={
+              isActive
+                ? { boxShadow: 'none', transform: 'translate(3px, 3px)' }
+                : undefined
+            }
+            type="button"
+          >
+            {item.label}
+          </RetroButton>
+        );
+      })}
     </div>
   );
 }
 
-export function DashboardModeButtons() {
-  return (
-    <div className="brutalist-card flex flex-wrap gap-4 bg-[#211e25] p-6">
-      <RetroButton className="min-w-[120px] flex-1 justify-center bg-[#45dfa4] font-black uppercase text-[#003825]">Normal</RetroButton>
-      <RetroButton className="min-w-[120px] flex-1 justify-center bg-[#ffc640] font-black uppercase text-[#261a00]">Certs</RetroButton>
-      <RetroButton className="min-w-[120px] flex-1 justify-center bg-[#ffb4ab] font-black uppercase text-[#690005]">Exam</RetroButton>
-    </div>
-  );
-}
+export function DashboardOverloadCard({ overloadPct }: { overloadPct: number }) {
+  const circumference = 2 * Math.PI * 70;
+  const filled = (overloadPct / 100) * circumference;
 
-export function DashboardOverloadCard() {
   return (
-    <BrutalistCard className="bg-[#211e25] p-6 border-red-400/30">
-      <div className="flex items-center gap-2 text-[#ffb4ab] mb-6">
+    <BrutalistCard className="border-red-400/30 bg-[#211e25] p-6">
+      <div className="mb-6 flex items-center gap-2 text-[#ffb4ab]">
         <DashboardIcon name="warning" />
         <span className="text-2xl font-bold uppercase">System Overload</span>
       </div>
-      <div className="relative w-40 h-40 mx-auto flex items-center justify-center mb-6">
-        <svg className="w-full h-full transform -rotate-90">
+      <div className="relative mx-auto mb-6 flex h-40 w-40 items-center justify-center">
+        <svg aria-label={`System overload at ${overloadPct}%`} className="h-full w-full -rotate-90 transform">
           <circle className="text-[#36343b]" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" strokeWidth="12" />
-          <circle className="text-[#ffb4ab]" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" strokeDasharray="440" strokeDashoffset="440" strokeWidth="12" />
+          <circle
+            className="text-[#ffb4ab]"
+            cx="80"
+            cy="80"
+            fill="transparent"
+            r="70"
+            stroke="currentColor"
+            strokeDasharray={`${filled} ${circumference}`}
+            strokeLinecap="round"
+            strokeWidth="12"
+          />
         </svg>
-        <span className="absolute text-4xl font-black">0%</span>
+        <span className="absolute text-4xl font-black">{overloadPct}%</span>
       </div>
-      <p className="text-center text-[#cac4d4]">You’re new here. Jump into a quest and start your adventure.</p>
+      <p className="text-center text-[#cac4d4]">
+        {overloadPct === 0
+          ? 'You are new here! Go to quest and start your adventure.'
+          : 'Consider pausing or rescheduling quests to recover.'}
+      </p>
     </BrutalistCard>
   );
 }
 
 export function DashboardAnalysisCard() {
+  const segments = [
+    { pct: 45, color: '#cebdff', label: 'Classes (45%)' },
+    { pct: 30, color: '#45dfa4', label: 'Certs (30%)' },
+    { pct: 25, color: '#ffc640', label: 'Projects (25%)' }
+  ];
+
+  const r = 15.9;
+  const circumference = 2 * Math.PI * r;
+  let offset = 0;
+
   return (
     <BrutalistCard className="bg-[#211e25] p-6">
-      <h4 className="text-sm font-bold uppercase tracking-widest text-[#cac4d4] mb-6">Workload Analysis</h4>
+      <h4 className="mb-6 text-sm font-bold uppercase tracking-widest text-[#cac4d4]">Workload Analysis</h4>
       <div className="flex items-center gap-8">
-        <div className="relative w-32 h-32">
-          <svg className="w-full h-full" viewBox="0 0 36 36">
-            <circle cx="18" cy="18" fill="transparent" r="15.9" stroke="#ffc640" strokeDasharray="100 0" strokeWidth="4" />
-            <circle cx="18" cy="18" fill="transparent" r="15.9" stroke="#45dfa4" strokeDasharray="75 25" strokeDashoffset="0" strokeWidth="4" />
-            <circle cx="18" cy="18" fill="transparent" r="15.9" stroke="#cebdff" strokeDasharray="45 55" strokeDashoffset="0" strokeWidth="4" />
+        <div className="relative h-32 w-32">
+          <svg aria-label="Workload analysis donut chart" className="h-full w-full -rotate-90 transform" viewBox="0 0 36 36">
+            <circle cx="18" cy="18" fill="transparent" r={r} stroke="#36343b" strokeWidth="4" />
+            {segments.map((segment) => {
+              const dash = (segment.pct / 100) * circumference;
+              const slice = (
+                <circle
+                  key={segment.label}
+                  cx="18"
+                  cy="18"
+                  fill="transparent"
+                  r={r}
+                  stroke={segment.color}
+                  strokeDasharray={`${dash} ${circumference}`}
+                  strokeDashoffset={-((offset / 100) * circumference)}
+                  strokeWidth="4"
+                />
+              );
+              offset += segment.pct;
+              return slice;
+            })}
             <circle cx="18" cy="18" fill="#211e25" r="12" />
           </svg>
         </div>
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-[#cebdff] border border-black" />
-            <span className="text-xs font-bold text-[#cac4d4]">Classes (45%)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-[#45dfa4] border border-black" />
-            <span className="text-xs font-bold text-[#cac4d4]">Certs (30%)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-[#ffc640] border border-black" />
-            <span className="text-xs font-bold text-[#cac4d4]">Projects (25%)</span>
-          </div>
+          {segments.map((segment) => (
+            <div key={segment.label} className="flex items-center gap-2">
+              <div className="h-3 w-3 border border-black" style={{ backgroundColor: segment.color }} />
+              <span className="text-xs font-bold text-[#cac4d4]">{segment.label}</span>
+            </div>
+          ))}
         </div>
       </div>
     </BrutalistCard>
   );
 }
 
-export function DashboardXpCard() {
+export function DashboardXpCard({ weeklyXp }: { weeklyXp: number }) {
   return (
     <BrutalistCard className="bg-[#a78bfa] p-6 text-[#3c1989]">
-      <div className="flex justify-between items-start mb-2">
+      <div className="mb-2 flex items-start justify-between">
         <h4 className="text-sm font-bold uppercase tracking-widest opacity-80">Weekly XP Potential</h4>
         <DashboardIcon name="trending_up" />
       </div>
-      <span className="text-5xl font-black mb-4 block">+340 XP</span>
+      <span className="mb-4 block text-5xl font-black">+{weeklyXp} XP</span>
       <p className="text-sm opacity-90">No quests for now! You can earn your XP simply by logging in!</p>
     </BrutalistCard>
   );
