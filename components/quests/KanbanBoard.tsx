@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 import { createTask, deleteTask, listTasks, updateTask } from '../../lib/api/tasks';
-import { DashboardIcon } from '../dashboard/DashboardIcon';
+import { Icon } from '../ui/Icon';
 import { RetroButton } from '../ui/RetroButton';
 
 import { TaskCard } from './TaskCard';
@@ -153,7 +153,7 @@ export function KanbanBoard() {
                   className="flex items-center gap-3 border-2 border-black p-4"
                   style={{ backgroundColor: '#1e1c24', boxShadow: '4px 4px 0px 0px #000' }}
                 >
-                  <DashboardIcon name={column.icon} className="h-5 w-5 flex-shrink-0" />
+                  <Icon name={column.icon} className="h-5 w-5 flex-shrink-0" />
                   <h3 className="text-sm font-extrabold uppercase tracking-widest" style={{ color: column.accent }}>
                     {column.label}
                   </h3>
