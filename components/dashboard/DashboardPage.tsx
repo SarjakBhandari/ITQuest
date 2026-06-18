@@ -11,10 +11,11 @@ import { Icon } from '../ui/Icon';
 import { DashboardSidebar } from './DashboardSidebar';
 import { DashboardTopBar } from './DashboardTopBar';
 
+import { ModeSelector } from '../quests/ModeSelector';
+import { MODE_CONFIG, type QuestMode } from '../../lib/quests/mode';
+
 import type { DashboardSummary, WorkloadSegment } from '../../types/dashboard';
 import type { TaskCategory } from '../../types/task';
-
-export type QuestMode = 'Normal' | 'Certs' | 'Exam';
 
 const emptySummary: DashboardSummary = {
   heroName: '',
@@ -191,31 +192,12 @@ function RetroCard({ children, borderColor = '#3f3d46', className = '' }: { chil
   );
 }
 
-function ModeBtn({ label, active, color, shadowColor, onClick }: { label: QuestMode; active: boolean; color: string; shadowColor: string; onClick: () => void }) {
-  return (
-    <button
-      aria-pressed={active}
-      className="min-h-[52px] flex-1 border-4 border-black py-3 text-base font-extrabold transition-all"
-      onClick={onClick}
-      style={{
-        backgroundColor: active ? color : '#1e1c24',
-        color: active ? '#0f0f13' : color,
-        boxShadow: active ? 'none' : `3px 3px 0px 0px ${shadowColor}`,
-        transform: active ? 'translate(3px, 3px)' : undefined,
-        outline: active ? `2px solid ${color}` : undefined
-      }}
-      type="button"
-    >
-      {label}
-    </button>
-  );
-}
-
 export function DashboardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showToast } = useToast();
   const [mode, setMode] = useState<QuestMode>('Normal');
+  const activeModeConfig = MODE_CONFIG.find((item) => item.label === mode) ?? MODE_CONFIG[0];
   const [summary, setSummary] = useState<DashboardSummary>(emptySummary);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -255,12 +237,6 @@ export function DashboardPage() {
       router.push('/login');
     }
   };
-
-  const modeConfig: { label: QuestMode; color: string; shadow: string }[] = [
-    { label: 'Normal', color: '#23d97e', shadow: '#065f46' },
-    { label: 'Certs', color: '#facc15', shadow: '#78350f' },
-    { label: 'Exam', color: '#f87171', shadow: '#7f1d1d' }
-  ];
 
   return (
     <div className="flex min-h-screen bg-[#0f0f13] text-[#e5e7eb]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -304,9 +280,10 @@ export function DashboardPage() {
                 </div>
                 <div className="ml-auto">
                   <div
-                    className="border-4 border-black px-8 py-3 text-base font-bold"
-                    style={{ backgroundColor: '#23d97e', color: '#0d2e24', boxShadow: '3px 3px 0px 0px #065f46' }}
+                    className="flex items-center gap-2 border-4 border-black px-8 py-3 text-base font-bold"
+                    style={{ backgroundColor: activeModeConfig.color, color: '#0f0f13', boxShadow: `3px 3px 0px 0px ${activeModeConfig.shadow}` }}
                   >
+                    <Icon name={activeModeConfig.icon} className="h-5 w-5" />
                     {mode} Mode
                   </div>
                 </div>
@@ -368,18 +345,7 @@ export function DashboardPage() {
             <div>
               <h2 className="mb-3 text-lg font-extrabold text-white">Change Modes</h2>
               <RetroCard borderColor="#2a2733">
-                <div aria-label="Select quest mode" className="flex gap-4" role="group">
-                  {modeConfig.map((item) => (
-                    <ModeBtn
-                      key={item.label}
-                      active={mode === item.label}
-                      color={item.color}
-                      label={item.label}
-                      onClick={() => setMode(item.label)}
-                      shadowColor={item.shadow}
-                    />
-                  ))}
-                </div>
+                <ModeSelector mode={mode} onChange={setMode} />
               </RetroCard>
             </div>
           </div>
