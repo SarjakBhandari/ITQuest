@@ -10,6 +10,7 @@ import { requestRegistrationOtp, verifyRegistrationOtp } from '../../lib/api/reg
 
 import { AuthPageLayout, AuthShell } from './AuthShell';
 import { RetroButton } from '../ui/RetroButton';
+import { useToast } from '../ui/ToastProvider';
 
 type OtpFormValues = {
   otp1: string;
@@ -25,6 +26,7 @@ const fieldNames = ['otp1', 'otp2', 'otp3', 'otp4', 'otp5', 'otp6'] as const;
 export function OtpVerificationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { showToast } = useToast();
   const email = searchParams.get('email') ?? '';
   const [message, setMessage] = useState('');
   const [resending, setResending] = useState(false);
@@ -65,6 +67,7 @@ export function OtpVerificationPage() {
         sessionStorage.removeItem('itquest-pending-signup');
         router.push('/dashboard?welcome=1');
       } else {
+        showToast('Account created! Please sign in.', 'success');
         router.push('/login');
       }
     } catch (error) {
