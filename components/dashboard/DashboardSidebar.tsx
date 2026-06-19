@@ -20,6 +20,7 @@ type DashboardSidebarProps = {
 export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [heroName, setHeroName] = useState('');
   const [level, setLevel] = useState<number | null>(null);
   const [xp, setXp] = useState(0);
   const [xpForNextLevel, setXpForNextLevel] = useState(500);
@@ -27,19 +28,25 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
   useEffect(() => {
     let cancelled = false;
 
-    getDashboardSummary()
-      .then(({ summary }) => {
-        if (cancelled) return;
-        setLevel(summary.level);
-        setXp(summary.xp);
-        setXpForNextLevel(summary.xpForNextLevel);
-      })
-      .catch(() => {
-        /* sidebar still renders without level info */
-      });
+    function refresh() {
+      getDashboardSummary()
+        .then(({ summary }) => {
+          if (cancelled) return;
+          setHeroName(summary.heroName);
+          setLevel(summary.level);
+          setXp(summary.xp);
+          setXpForNextLevel(summary.xpForNextLevel);
+        })
+        .catch(() => {
+          /* sidebar still renders without level info */
+        });
+    }
 
+    refresh();
+    window.addEventListener('itquest:xp-updated', refresh);
     return () => {
       cancelled = true;
+      window.removeEventListener('itquest:xp-updated', refresh);
     };
   }, []);
 
@@ -73,7 +80,10 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
             <Icon filled name="person" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-[#e6e0ea]">{level !== null ? `Level ${level}` : 'Loading...'}</p>
+            <p className="truncate text-sm font-bold text-[#e6e0ea]">
+              {heroName || 'Loading...'}
+              {level !== null ? ` · Level ${level}` : ''}
+            </p>
             <p className="text-[10px] uppercase tracking-wide text-[#cac4d4]">
               {xp} / {xpForNextLevel} XP
             </p>

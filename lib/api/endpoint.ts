@@ -10,5 +10,10 @@ export const apiEndpoints = {
   registrationVerifyOtp: `${baseUrl}/auth/registration/verify-otp`,
   tasks: `${baseUrl}/tasks`,
   task: (id: string) => `${baseUrl}/tasks/${id}`,
-  dashboardSummary: `${baseUrl}/dashboard/summary`
+  snoozeTask: (id: string) => `${baseUrl}/tasks/${id}/snooze`,
+  dashboardSummary: (mode?: string) => `${baseUrl}/dashboard/summary${mode ? `?mode=${encodeURIComponent(mode)}` : ''}`,
+  myGroup: `${baseUrl}/groups/me`,
+  groups: `${baseUrl}/groups`,
+  joinGroup: `${baseUrl}/groups/join`,
+  leaveGroup: `${baseUrl}/groups/leave`
 } as const;

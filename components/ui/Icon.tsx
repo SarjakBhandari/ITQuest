@@ -2,6 +2,7 @@ type IconProps = {
   name: string;
   filled?: boolean;
   className?: string;
+  style?: React.CSSProperties;
 };
 
 type IconRenderer = (filled: boolean) => React.ReactNode;
@@ -46,6 +47,7 @@ const icons: Record<string, IconRenderer> = {
     </>
   ),
   play: () => <path fill="currentColor" d="M8 5v14l11-7z" />,
+  check: () => <path {...strokeProps} strokeWidth={4} d="M5 13l4 4L19 7" />,
   arrow_right: () => (
     <>
       <path {...strokeProps} d="M13 5l7 7-7 7" />
@@ -211,16 +213,36 @@ const icons: Record<string, IconRenderer> = {
       <rect {...strokeProps} x="9.5" y="4" width="6" height="10" rx="1" />
       <rect {...strokeProps} x="16" y="4" width="6" height="13" rx="1" />
     </>
-  )
+  ),
+  sparkle: () => (
+    <>
+      <path fill="currentColor" d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z" />
+      <path fill="currentColor" opacity=".6" d="M19 14l.75 2.25L22 17l-2.25.75L19 20l-.75-2.25L16 17l2.25-.75L19 14z" />
+      <path fill="currentColor" opacity=".4" d="M5 17l.5 1.5L7 19l-1.5.5L5 21l-.5-1.5L3 19l1.5-.5L5 17z" />
+    </>
+  ),
+  close: () => (
+    <>
+      <line {...strokeProps} strokeWidth={2.5} x1="18" y1="6" x2="6" y2="18" />
+      <line {...strokeProps} strokeWidth={2.5} x1="6" y1="6" x2="18" y2="18" />
+    </>
+  ),
+  content_copy: () => (
+    <>
+      <rect {...strokeProps} x="9" y="9" width="12" height="12" rx="1" />
+      <path {...strokeProps} d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+    </>
+  ),
+  crown: () => <path fill="currentColor" d="M3 7l4 4 5-6 5 6 4-4-2 11H5L3 7zm2 13h14v2H5v-2z" />
 };
 
 const fallbackIcon: IconRenderer = () => <circle {...strokeProps} cx="12" cy="12" r="9" />;
 
-export function Icon({ name, filled = false, className }: IconProps) {
+export function Icon({ name, filled = false, className, style }: IconProps) {
   const render = icons[name] ?? fallbackIcon;
 
   return (
-    <svg aria-hidden="true" className={className || 'h-5 w-5'} viewBox="0 0 24 24">
+    <svg aria-hidden="true" className={className || 'h-5 w-5'} style={style} viewBox="0 0 24 24">
       {render(filled)}
     </svg>
   );
