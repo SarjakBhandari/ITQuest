@@ -32,7 +32,7 @@ export function OverloadWarningModal({ onDismiss }: OverloadWarningModalProps) {
 
           <h2 className="mb-4 text-2xl font-black uppercase italic tracking-tight text-white">You&apos;re overloaded!!</h2>
           <p className="mb-10 max-w-xs text-sm font-medium italic leading-relaxed text-gray-300">
-            You have too many active quests — put one to Rest or finish it before adding more.
+            You have too many active quests - put one to Rest or finish it before adding more.
           </p>
 
           <button

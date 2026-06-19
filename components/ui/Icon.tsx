@@ -226,7 +226,14 @@ const icons: Record<string, IconRenderer> = {
       <line {...strokeProps} strokeWidth={2.5} x1="18" y1="6" x2="6" y2="18" />
       <line {...strokeProps} strokeWidth={2.5} x1="6" y1="6" x2="18" y2="18" />
     </>
-  )
+  ),
+  content_copy: () => (
+    <>
+      <rect {...strokeProps} x="9" y="9" width="12" height="12" rx="1" />
+      <path {...strokeProps} d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+    </>
+  ),
+  crown: () => <path fill="currentColor" d="M3 7l4 4 5-6 5 6 4-4-2 11H5L3 7zm2 13h14v2H5v-2z" />
 };
 
 const fallbackIcon: IconRenderer = () => <circle {...strokeProps} cx="12" cy="12" r="9" />;

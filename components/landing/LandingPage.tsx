@@ -11,7 +11,7 @@ const features = [
     color: '#a78bfa',
     label: 'QUEST BOARD',
     title: 'Drag-and-drop Kanban',
-    description: 'Move quests across Backlog, In Progress, Rest, and Done — a board that actually matches how your workload flows.'
+    description: 'Move quests across Backlog, In Progress, Rest, and Done - a board that actually matches how your workload flows.'
   },
   {
     icon: 'star',
@@ -93,7 +93,7 @@ export default function LandingPage() {
                 <AppLogo priority sizeClassName="h-28 w-28 sm:h-32 sm:w-32" />
               </div>
               <p className="mt-6 text-sm font-bold uppercase tracking-[0.35em] text-[#23d97e]">Quest board snapshot</p>
-              <h2 className="mt-3 text-2xl font-black text-white">From Backlog to Done — gamified every step</h2>
+              <h2 className="mt-3 text-2xl font-black text-white">From Backlog to Done - gamified every step</h2>
               <p className="mt-3 text-sm leading-6 text-[#9ca3af]">
                 Backlog, In Progress, Rest, and Done. Drag a quest forward, bank the XP, and let your level, streak, and
                 overload meter track the rest.

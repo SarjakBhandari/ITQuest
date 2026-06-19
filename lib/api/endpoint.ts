@@ -11,5 +11,9 @@ export const apiEndpoints = {
   tasks: `${baseUrl}/tasks`,
   task: (id: string) => `${baseUrl}/tasks/${id}`,
   snoozeTask: (id: string) => `${baseUrl}/tasks/${id}/snooze`,
-  dashboardSummary: (mode?: string) => `${baseUrl}/dashboard/summary${mode ? `?mode=${encodeURIComponent(mode)}` : ''}`
+  dashboardSummary: (mode?: string) => `${baseUrl}/dashboard/summary${mode ? `?mode=${encodeURIComponent(mode)}` : ''}`,
+  myGroup: `${baseUrl}/groups/me`,
+  groups: `${baseUrl}/groups`,
+  joinGroup: `${baseUrl}/groups/join`,
+  leaveGroup: `${baseUrl}/groups/leave`
 } as const;
