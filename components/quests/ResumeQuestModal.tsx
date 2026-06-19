@@ -44,7 +44,7 @@ export function ResumeQuestModal({ questTitle, note, onClose, onConfirm }: Resum
 
           <div className="mb-8 h-48 w-full overflow-y-auto border-2 border-[#2d2a33] bg-[#1a181e] p-6 text-left">
             <p className="text-sm leading-relaxed text-gray-300">
-              {note || 'No note was left for this quest — jump back in whenever you are ready.'}
+              {note || 'No note was left for this quest - jump back in whenever you are ready.'}
             </p>
           </div>
 

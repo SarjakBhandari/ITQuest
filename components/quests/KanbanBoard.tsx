@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 import { getDashboardSummary } from '../../lib/api/dashboard';
+import { getMyGroup } from '../../lib/api/groups';
 import { createTask, deleteTask, listTasks, snoozeTask, updateTask } from '../../lib/api/tasks';
 import { Icon } from '../ui/Icon';
 import { RetroButton } from '../ui/RetroButton';
@@ -60,6 +61,25 @@ export function KanbanBoard() {
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
   const [dragOverStatus, setDragOverStatus] = useState<TaskStatus | null>(null);
   const [mode, setMode] = useState<QuestMode>('Normal');
+  const [groupRank, setGroupRank] = useState<{ groupName: string; rank: number } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getMyGroup()
+      .then(({ group }) => {
+        if (cancelled || !group) return;
+        const mine = group.leaderboard.find((entry) => entry.isYou);
+        if (mine) setGroupRank({ groupName: group.name, rank: mine.rank });
+      })
+      .catch(() => {
+        /* group membership is optional, ignore failures */
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -121,7 +141,7 @@ export function KanbanBoard() {
     } else {
       const { task } = await createTask(input);
       setTasks((prev) => [...prev, task]);
-      showToast(`"${task.title}" added to Backlog — worth ${task.xp} XP!`, 'success');
+      showToast(`"${task.title}" added to Backlog - worth ${task.xp} XP!`, 'success');
     }
     setModalState(null);
   }
@@ -154,6 +174,21 @@ export function KanbanBoard() {
         xpForNextLevel: summary.xpForNextLevel
       });
       window.dispatchEvent(new Event('itquest:xp-updated'));
+
+      if (groupRank) {
+        try {
+          const { group: updatedGroup } = await getMyGroup();
+          const mine = updatedGroup?.leaderboard.find((entry) => entry.isYou);
+          if (mine) {
+            if (mine.rank < groupRank.rank) {
+              showToast(`You climbed to #${mine.rank} in ${updatedGroup!.name}!`, 'success');
+            }
+            setGroupRank({ groupName: updatedGroup!.name, rank: mine.rank });
+          }
+        } catch {
+          /* group rank check is non-critical */
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to complete quest.');
     }
@@ -163,7 +198,7 @@ export function KanbanBoard() {
     try {
       const { task: updated, cutXp } = await snoozeTask(task._id);
       setTasks((prev) => prev.map((item) => (item._id === updated._id ? updated : item)));
-      showToast(`"${task.title}" snoozed for 1 more day — -${cutXp} XP.`, 'info');
+      showToast(`"${task.title}" snoozed for 1 more day - -${cutXp} XP.`, 'info');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to snooze quest.');
     }
@@ -175,7 +210,7 @@ export function KanbanBoard() {
     try {
       const { task: updated } = await updateTask(task._id, { status: 'rest', note });
       setTasks((prev) => prev.map((item) => (item._id === updated._id ? updated : item)));
-      showToast(`"${task.title}" paused — resting until you're ready.`, 'info');
+      showToast(`"${task.title}" paused - resting until you're ready.`, 'info');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to pause quest.');
     } finally {
@@ -189,7 +224,7 @@ export function KanbanBoard() {
     try {
       const { task: updated } = await updateTask(task._id, { status: targetStatus });
       setTasks((prev) => prev.map((item) => (item._id === updated._id ? updated : item)));
-      showToast(`"${task.title}" resumed — back in action!`, 'success');
+      showToast(`"${task.title}" resumed - back in action!`, 'success');
       if (targetStatus === 'in-progress' && activeQuestCount + 1 > ACTIVE_QUEST_LIMIT) {
         setShowOverloadWarning(true);
       }
@@ -316,7 +351,7 @@ export function KanbanBoard() {
                   >
                     <Icon name={isOverloaded ? 'warning' : 'trending_up'} className="h-3.5 w-3.5 flex-shrink-0" />
                     <span>
-                      {activeQuestCount} / {ACTIVE_QUEST_LIMIT} active {isOverloaded ? '— overloaded!' : ''}
+                      {activeQuestCount} / {ACTIVE_QUEST_LIMIT} active {isOverloaded ? '- overloaded!' : ''}
                     </span>
                   </div>
                 ) : null}

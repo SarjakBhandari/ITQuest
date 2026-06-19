@@ -69,7 +69,7 @@ export function PauseQuestModal({ questTitle, onClose, onConfirm }: PauseQuestMo
             onClick={handleConfirm}
             type="button"
           >
-            {isSubmitting ? 'Pausing…' : 'Sleep!!!'}
+            {isSubmitting ? 'Pausing...' : 'Sleep!!!'}
           </button>
           <button
             className="border border-[#3b383f] bg-[#3b383f]/30 px-10 py-3 font-black uppercase tracking-wider text-gray-300 shadow-[4px_4px_0px_0px_#000] transition-transform hover:translate-x-0.5 hover:translate-y-0.5"

@@ -93,7 +93,7 @@ function WorkloadDonut({ segments }: { segments: WorkloadSegment[] }) {
         <svg aria-label="Workload analysis donut chart" className="h-20 w-20 flex-shrink-0" viewBox="0 0 100 100">
           <circle cx="50" cy="50" fill="none" r={r} stroke="#2a2733" strokeWidth="16" />
         </svg>
-        <p className="text-xs text-gray-500">No active quests yet — your workload breakdown will show up here.</p>
+        <p className="text-xs text-gray-500">No active quests yet - your workload breakdown will show up here.</p>
       </div>
     );
   }
@@ -297,7 +297,7 @@ export function DashboardPage() {
                   <p className="py-8 text-center text-sm text-gray-500">Loading...</p>
                 ) : summary.priorityQuests.length === 0 ? (
                   <p className="py-8 text-center text-sm text-gray-500">
-                    No priority quests yet — start a new quest to begin your adventure.
+                    No priority quests yet - start a new quest to begin your adventure.
                   </p>
                 ) : (
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -362,8 +362,8 @@ export function DashboardPage() {
                 {summary.overloadPct === 0
                   ? 'You are new here! Go to quest and start your adventure.'
                   : summary.overloadPct < 50
-                    ? 'Manageable for now — keep an eye on upcoming due dates.'
-                    : 'Heavy workload ahead — consider rescheduling or completing overdue quests.'}
+                    ? 'Manageable for now - keep an eye on upcoming due dates.'
+                    : 'Heavy workload ahead - consider rescheduling or completing overdue quests.'}
               </p>
             </RetroCard>
 

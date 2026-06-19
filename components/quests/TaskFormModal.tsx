@@ -152,7 +152,7 @@ export function TaskFormModal({ task, defaultStatus, onClose, onSubmit }: TaskFo
                 }}
                 aria-invalid={errors.title ? 'true' : 'false'}
                 aria-describedby={errors.title ? 'questName-error' : undefined}
-                {...register('title', { required: 'Quest name is required — give your quest a title.' })}
+                {...register('title', { required: 'Quest name is required - give your quest a title.' })}
               />
               {errors.title ? (
                 <p className="mt-0.5 text-xs text-[#f87171]" id="questName-error" role="alert">
@@ -258,7 +258,7 @@ export function TaskFormModal({ task, defaultStatus, onClose, onSubmit }: TaskFo
                 style={{ backgroundColor: '#a78bfa', color: '#0f0f13', boxShadow: isSubmitting ? 'none' : '4px 4px 0px 0px #312e81', minHeight: '60px' }}
                 type="submit"
               >
-                {isSubmitting ? 'Saving…' : 'Save Quest'}
+                {isSubmitting ? 'Saving...' : 'Save Quest'}
               </button>
 
               <button
