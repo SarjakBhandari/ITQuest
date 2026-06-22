@@ -1,6 +1,7 @@
 export type GroupLeaderboardEntry = {
   id: string;
   heroName: string;
+  avatarColor: string | null;
   seasonXp: number;
   rank: number;
   isYou: boolean;
