@@ -23,7 +23,7 @@ export function QuestsPage() {
     <div className="flex min-h-screen bg-[#0f0f13] text-[#e5e7eb]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       <DashboardSidebar onLogout={handleLogout} />
       <DashboardTopBar title="Quests" />
-      <div className="ml-[240px] flex flex-1 flex-col overflow-auto pt-24">
+      <div className="flex flex-1 flex-col overflow-auto pt-20 lg:ml-[240px] lg:pt-24">
         <KanbanBoard />
       </div>
     </div>

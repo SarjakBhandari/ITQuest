@@ -22,8 +22,6 @@ import { TaskFormModal } from './TaskFormModal';
 import { MODE_CATEGORY_FILTER, type QuestMode } from '../../lib/quests/mode';
 import type { CreateTaskInput, Task, TaskStatus } from '../../types/task';
 
-const ACTIVE_QUEST_LIMIT = 5;
-
 const columns: { status: TaskStatus; label: string; icon: string; accent: string }[] = [
   { status: 'backlog', label: 'Backlog', icon: 'inventory_2', accent: '#9ca3af' },
   { status: 'in-progress', label: 'In Progress', icon: 'swords', accent: '#a78bfa' },
@@ -62,6 +60,7 @@ export function KanbanBoard() {
   const [dragOverStatus, setDragOverStatus] = useState<TaskStatus | null>(null);
   const [mode, setMode] = useState<QuestMode>('Normal');
   const [groupRank, setGroupRank] = useState<{ groupName: string; rank: number } | null>(null);
+  const [activeQuestLimit, setActiveQuestLimit] = useState(5);
 
   useEffect(() => {
     let cancelled = false;
@@ -74,6 +73,14 @@ export function KanbanBoard() {
       })
       .catch(() => {
         /* group membership is optional, ignore failures */
+      });
+
+    getDashboardSummary()
+      .then(({ summary }) => {
+        if (!cancelled) setActiveQuestLimit(summary.maxActiveQuests);
+      })
+      .catch(() => {
+        /* fall back to the default limit */
       });
 
     return () => {
@@ -120,7 +127,7 @@ export function KanbanBoard() {
 
   // Overload always reflects the true total workload, regardless of which mode is being viewed.
   const activeQuestCount = useMemo(() => tasks.filter((task) => task.status === 'in-progress').length, [tasks]);
-  const isOverloaded = activeQuestCount > ACTIVE_QUEST_LIMIT;
+  const isOverloaded = activeQuestCount > activeQuestLimit;
 
   useEffect(() => {
     if (searchParams.get('new') !== '1') return;
@@ -225,7 +232,7 @@ export function KanbanBoard() {
       const { task: updated } = await updateTask(task._id, { status: targetStatus });
       setTasks((prev) => prev.map((item) => (item._id === updated._id ? updated : item)));
       showToast(`"${task.title}" resumed - back in action!`, 'success');
-      if (targetStatus === 'in-progress' && activeQuestCount + 1 > ACTIVE_QUEST_LIMIT) {
+      if (targetStatus === 'in-progress' && activeQuestCount + 1 > activeQuestLimit) {
         setShowOverloadWarning(true);
       }
     } catch (err) {
@@ -243,7 +250,7 @@ export function KanbanBoard() {
     try {
       await updateTask(task._id, { status, order: targetOrder });
       showToast(`"${task.title}" moved to ${statusLabel[status]}.`, 'info');
-      if (status === 'in-progress' && activeQuestCount + 1 > ACTIVE_QUEST_LIMIT) {
+      if (status === 'in-progress' && activeQuestCount + 1 > activeQuestLimit) {
         setShowOverloadWarning(true);
       }
     } catch (err) {
@@ -291,7 +298,7 @@ export function KanbanBoard() {
         <p className="border-b-2 border-[#f87171] bg-[#f87171]/10 px-6 py-2 text-sm text-[#fecaca]">{error}</p>
       ) : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b-2 border-[#2a2733] bg-[#15131a] px-6 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b-2 border-[#2a2733] bg-[#15131a] px-4 py-4 sm:px-6">
         <div>
           <h2 className="text-lg font-extrabold text-white">Your Quest Board</h2>
           <p className="text-xs text-[#6b7280]">
@@ -301,7 +308,7 @@ export function KanbanBoard() {
         <ModeSelector compact mode={mode} onChange={setMode} />
       </div>
 
-      <section className="flex-1 overflow-x-auto p-6">
+      <section className="flex-1 overflow-x-auto p-4 sm:p-6">
         {isLoading ? (
           <div className="flex h-full items-center justify-center">
             <p className="flex items-center gap-2 text-sm text-gray-500">
@@ -310,11 +317,11 @@ export function KanbanBoard() {
             </p>
           </div>
         ) : (
-          <div className="flex h-full min-w-max gap-6">
+          <div className="flex h-full min-w-max gap-4 sm:gap-6">
             {columns.map((column) => (
               <div
                 key={column.status}
-                className="flex w-80 flex-shrink-0 flex-col gap-4"
+                className="flex w-[78vw] max-w-[320px] flex-shrink-0 flex-col gap-4 sm:w-80"
                 onDragOver={(event) => {
                   event.preventDefault();
                   setDragOverStatus(column.status);
@@ -351,7 +358,7 @@ export function KanbanBoard() {
                   >
                     <Icon name={isOverloaded ? 'warning' : 'trending_up'} className="h-3.5 w-3.5 flex-shrink-0" />
                     <span>
-                      {activeQuestCount} / {ACTIVE_QUEST_LIMIT} active {isOverloaded ? '- overloaded!' : ''}
+                      {activeQuestCount} / {activeQuestLimit} active {isOverloaded ? '- overloaded!' : ''}
                     </span>
                   </div>
                 ) : null}

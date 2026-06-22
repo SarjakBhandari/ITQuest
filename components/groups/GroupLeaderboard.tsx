@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import { leaveGroup } from '../../lib/api/groups';
+import { resolveAvatarColor } from '../../lib/avatar';
 import { Icon } from '../ui/Icon';
 import { useToast } from '../ui/ToastProvider';
 
@@ -10,20 +11,13 @@ import { SeasonCountdown } from './SeasonCountdown';
 
 import type { GroupLeaderboardEntry, GroupSummary } from '../../types/group';
 
-const AVATAR_COLORS = ['#a78bfa', '#facc15', '#23d97e', '#60a5fa', '#f87171', '#45dfa4'];
 const RANK_ACCENTS: Record<number, string> = { 1: '#facc15', 2: '#9ca3af', 3: '#a78bfa' };
 
-function avatarColor(heroName: string) {
-  let hash = 0;
-  for (let i = 0; i < heroName.length; i += 1) hash = (hash + heroName.charCodeAt(i)) % AVATAR_COLORS.length;
-  return AVATAR_COLORS[hash];
-}
-
-function Avatar({ heroName, size = 40 }: { heroName: string; size?: number }) {
+function Avatar({ heroName, avatarColor, size = 40 }: { heroName: string; avatarColor?: string | null; size?: number }) {
   return (
     <div
       className="flex flex-shrink-0 items-center justify-center border-2 border-black font-extrabold text-[#0f0f13]"
-      style={{ width: size, height: size, backgroundColor: avatarColor(heroName), fontSize: size / 2.4 }}
+      style={{ width: size, height: size, backgroundColor: resolveAvatarColor(heroName, avatarColor), fontSize: size / 2.4 }}
     >
       {heroName.charAt(0).toUpperCase()}
     </div>
@@ -65,7 +59,7 @@ function RosterRow({ entry, aboveEntry, maxSeasonXp, animateIn }: RosterRowProps
         {accent ? <Icon className="h-4 w-4" name="crown" style={{ color: accent }} /> : null}
       </div>
       <div className="col-span-3 flex items-center gap-3">
-        <Avatar heroName={entry.heroName} />
+        <Avatar avatarColor={entry.avatarColor} heroName={entry.heroName} />
         <span className={`font-medium ${entry.isYou ? 'font-bold text-[#a78bfa]' : 'text-gray-200'}`}>
           {entry.heroName}
           {entry.isYou ? ' (You)' : ''}
@@ -141,8 +135,8 @@ export function GroupLeaderboard({ group, onLeft }: GroupLeaderboardProps) {
   };
 
   return (
-    <div className="flex flex-1 flex-col p-6">
-      <section className="mb-10 flex flex-wrap items-start justify-between gap-4 border-2 border-black bg-[#1d1a21] p-6 shadow-[6px_6px_0px_0px_#000]">
+    <div className="flex flex-1 flex-col p-4 sm:p-6">
+      <section className="mb-10 flex flex-wrap items-start justify-between gap-4 border-2 border-black bg-[#1d1a21] p-4 shadow-[6px_6px_0px_0px_#000] sm:p-6">
         <div className="flex items-center gap-6">
           <div
             className="flex h-16 w-16 flex-shrink-0 items-center justify-center border-4 border-black"
@@ -181,7 +175,7 @@ export function GroupLeaderboard({ group, onLeft }: GroupLeaderboardProps) {
           <div className="flex w-full max-w-3xl items-end justify-center gap-4 px-4">
             {second ? (
               <div className="flex flex-1 flex-col items-center">
-                <Avatar heroName={second.heroName} size={56} />
+                <Avatar avatarColor={second.avatarColor} heroName={second.heroName} size={56} />
                 <p className="mt-2 text-sm font-bold text-white">
                   {second.heroName}
                   {second.isYou ? ' (You)' : ''}
@@ -200,7 +194,7 @@ export function GroupLeaderboard({ group, onLeft }: GroupLeaderboardProps) {
             {first ? (
               <div className="z-10 flex flex-1 flex-col items-center">
                 <Icon className="mb-1 h-9 w-9" name="crown" style={{ color: '#facc15' }} />
-                <Avatar heroName={first.heroName} size={80} />
+                <Avatar avatarColor={first.avatarColor} heroName={first.heroName} size={80} />
                 <p className="mt-2 text-base font-extrabold" style={{ color: '#facc15' }}>
                   {first.heroName}
                   {first.isYou ? ' (You)' : ''}
@@ -219,7 +213,7 @@ export function GroupLeaderboard({ group, onLeft }: GroupLeaderboardProps) {
 
             {third ? (
               <div className="flex flex-1 flex-col items-center">
-                <Avatar heroName={third.heroName} size={56} />
+                <Avatar avatarColor={third.avatarColor} heroName={third.heroName} size={56} />
                 <p className="mt-2 text-sm font-bold text-white">
                   {third.heroName}
                   {third.isYou ? ' (You)' : ''}
@@ -239,27 +233,31 @@ export function GroupLeaderboard({ group, onLeft }: GroupLeaderboardProps) {
       )}
 
       {group.leaderboard.length > 0 ? (
-        <section className="mb-12 border-2 border-black bg-[#211e25] p-6 shadow-[8px_8px_0px_0px_#000]">
-          <div className="mb-1 flex items-center justify-between">
+        <section className="mb-12 border-2 border-black bg-[#211e25] p-4 shadow-[8px_8px_0px_0px_#000] sm:p-6">
+          <div className="mb-1 flex flex-wrap items-center justify-between gap-1">
             <h3 className="text-sm font-extrabold uppercase tracking-widest text-white">Season Roster</h3>
             <p className="text-xs text-[#9ca3af]">Earn quest XP to climb the gauge below</p>
           </div>
-          <div className="grid grid-cols-12 gap-4 border-b-2 border-black pb-4 pt-3 text-[10px] font-bold uppercase tracking-widest text-[#9ca3af]">
-            <div className="col-span-1">Rank</div>
-            <div className="col-span-3">Adventurer</div>
-            <div className="col-span-6">Experience Gauge</div>
-            <div className="col-span-2 text-right">Season XP</div>
-          </div>
-          <div className="mt-4 space-y-3">
-            {group.leaderboard.map((entry, index) => (
-              <RosterRow
-                key={entry.id}
-                animateIn={animateIn}
-                aboveEntry={group.leaderboard[index - 1]}
-                entry={entry}
-                maxSeasonXp={maxSeasonXp}
-              />
-            ))}
+          <div className="overflow-x-auto">
+            <div className="min-w-[640px]">
+              <div className="grid grid-cols-12 gap-4 border-b-2 border-black pb-4 pt-3 text-[10px] font-bold uppercase tracking-widest text-[#9ca3af]">
+                <div className="col-span-1">Rank</div>
+                <div className="col-span-3">Adventurer</div>
+                <div className="col-span-6">Experience Gauge</div>
+                <div className="col-span-2 text-right">Season XP</div>
+              </div>
+              <div className="mt-4 space-y-3">
+                {group.leaderboard.map((entry, index) => (
+                  <RosterRow
+                    key={entry.id}
+                    animateIn={animateIn}
+                    aboveEntry={group.leaderboard[index - 1]}
+                    entry={entry}
+                    maxSeasonXp={maxSeasonXp}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       ) : null}

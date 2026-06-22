@@ -32,7 +32,7 @@ const features = [
     color: '#f87171',
     label: 'BALANCE',
     title: 'System overload warnings',
-    description: 'Too many overdue or urgent quests trip the overload meter, so you see the burnout risk before it hits.'
+    description: 'Too many active quests trips the overload meter and pops a warning, so you see the burnout risk before it hits.'
   },
   {
     icon: 'bedtime',
@@ -42,12 +42,61 @@ const features = [
     description: 'Send a quest to Rest the moment life gets busy, then pull it back into action whenever you are ready to go again.'
   },
   {
-    icon: 'trophy',
+    icon: 'shield',
     color: '#23d97e',
+    label: 'FOCUS MODES',
+    title: 'Normal, Certs & Exam modes',
+    description: 'Flip a switch on the dashboard or quest board to narrow your view to just certification prep or class deadlines.'
+  },
+  {
+    icon: 'trophy',
+    color: '#f87171',
     label: 'COMMUNITY',
-    title: 'Groups & competition',
-    description: 'Team up in groups, compare XP on shared leaderboards, and turn getting things done into friendly competition.'
+    title: 'Guild leaderboards & seasons',
+    description: 'Found or join a guild, climb a weekly leaderboard ranked by XP, and watch the season reset every Monday for a fresh shot at #1.'
+  },
+  {
+    icon: 'shield',
+    color: '#facc15',
+    label: 'ACHIEVEMENTS',
+    title: 'Badges for every milestone',
+    description: 'Unlock badges like First Blood, Centurion, and Jack of All Trades as you complete quests, build streaks, and explore categories.'
+  },
+  {
+    icon: 'bar_chart',
+    color: '#a78bfa',
+    label: 'INSIGHTS',
+    title: 'A full stats dashboard',
+    description: 'See your XP breakdown by category, a 7-day activity chart, and your full badge collection in one place.'
   }
+];
+
+const steps = [
+  {
+    number: '1',
+    icon: 'add',
+    title: 'Log a quest',
+    description: 'Add an assignment, project, or cert goal. Set its category, difficulty, and deadline - IT Quest works out the XP.'
+  },
+  {
+    number: '2',
+    icon: 'swords',
+    title: 'Work it like a quest board',
+    description: 'Drag it into In Progress, pause it on Rest when life happens, and mark it Done when it is finished.'
+  },
+  {
+    number: '3',
+    icon: 'trophy',
+    title: 'Level up & compete',
+    description: 'Bank XP, grow your streak, unlock badges, and climb your guild leaderboard before the weekly season resets.'
+  }
+];
+
+const sampleBadges = [
+  { icon: 'swords', label: 'First Blood', color: '#facc15' },
+  { icon: 'shield', label: 'Centurion', color: '#23d97e' },
+  { icon: 'local_fire_department', label: 'Unstoppable', color: '#f97316' },
+  { icon: 'star', label: 'Veteran', color: '#a78bfa' }
 ];
 
 export default function LandingPage() {
@@ -59,16 +108,17 @@ export default function LandingPage() {
         <section className="grid flex-1 items-center gap-10 py-10 lg:grid-cols-[1.2fr_0.8fr] lg:py-14">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 border-2 border-black bg-[#a78bfa] px-3 py-1 text-xs font-black uppercase tracking-[0.35em] text-[#1d1a21]">
-              Gamified Kanban
+              Gamified Productivity
             </div>
 
             <h1 className="mt-5 text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Level up your workload without losing your place.
+              Turn your workload into a quest you actually want to finish.
             </h1>
 
             <p className="mt-5 max-w-xl text-base leading-7 text-[#9ca3af] sm:text-lg">
               Track every assignment, project, and cert on a drag-and-drop quest board. Earn XP for what you finish,
-              build a streak for showing up, and watch the overload meter before it tips into burnout.
+              build a streak for showing up, unlock achievement badges, and compete with friends on a weekly guild
+              leaderboard.
             </p>
 
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -83,7 +133,8 @@ export default function LandingPage() {
             <div className="mt-5 flex flex-wrap gap-3 text-sm text-[#9ca3af]">
               <span className="border-2 border-[#2a2733] bg-[#1e1c24] px-3 py-1">Drag &amp; drop quests</span>
               <span className="border-2 border-[#2a2733] bg-[#1e1c24] px-3 py-1">XP every completion</span>
-              <span className="border-2 border-[#2a2733] bg-[#1e1c24] px-3 py-1">Group leaderboards</span>
+              <span className="border-2 border-[#2a2733] bg-[#1e1c24] px-3 py-1">Guild leaderboards</span>
+              <span className="border-2 border-[#2a2733] bg-[#1e1c24] px-3 py-1">Achievement badges</span>
             </div>
           </div>
 
@@ -107,10 +158,36 @@ export default function LandingPage() {
               </div>
               <div className="border-2 border-[#2a2733] bg-[#141219] p-4">
                 <p className="text-xs font-black uppercase tracking-[0.3em] text-[#23d97e]">Team play</p>
-                <p className="mt-2 text-sm text-[#9ca3af]">Join a group, compare XP on the leaderboard, and turn the grind into a competition.</p>
+                <p className="mt-2 text-sm text-[#9ca3af]">Found or join a guild, compare XP on a weekly leaderboard, and turn the grind into a competition.</p>
               </div>
             </div>
           </aside>
+        </section>
+
+        <section className="pb-10 lg:pb-14">
+          <div className="mb-5 flex items-center gap-4">
+            <div className="h-px flex-1 bg-[#2a2733]" />
+            <span className="text-xs font-black uppercase tracking-[0.35em] text-[#6b7280]">How it works</span>
+            <div className="h-px flex-1 bg-[#2a2733]" />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {steps.map((step) => (
+              <div key={step.number} className="border-4 border-black bg-[#1e1c24] p-6 shadow-[6px_6px_0px_0px_#000]">
+                <div className="flex items-center gap-3">
+                  <span
+                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center border-2 border-black text-lg font-black"
+                    style={{ backgroundColor: '#23d97e', color: '#0d2e24' }}
+                  >
+                    {step.number}
+                  </span>
+                  <Icon className="h-6 w-6" name={step.icon} style={{ color: '#a78bfa' }} />
+                </div>
+                <h3 className="mt-4 text-lg font-black text-white">{step.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-[#9ca3af]">{step.description}</p>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="pb-10 lg:pb-14">
@@ -147,6 +224,50 @@ export default function LandingPage() {
                 </div>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section className="pb-10 lg:pb-14">
+          <div className="border-4 border-black bg-[#1e1c24] p-6 shadow-[8px_8px_0px_0px_#000] sm:p-8">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.35em] text-[#facc15]">Achievements await</p>
+                <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">Every quest gets you closer to a badge.</h2>
+              </div>
+              <p className="max-w-sm text-sm text-[#9ca3af]">
+                Twelve badges track everything from your first completed quest to a 30-day streak, level milestones, and
+                joining a guild. Your full collection lives on the Stats page.
+              </p>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {sampleBadges.map((badge) => (
+                <div
+                  key={badge.label}
+                  className="flex flex-col items-center gap-2 border-2 border-black bg-[#141219] p-4 text-center"
+                >
+                  <div
+                    className="flex h-12 w-12 items-center justify-center border-2 border-black"
+                    style={{ backgroundColor: badge.color, color: '#0f0f13' }}
+                  >
+                    <Icon className="h-6 w-6" name={badge.icon} />
+                  </div>
+                  <p className="text-xs font-bold text-white">{badge.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="pb-10 lg:pb-14">
+          <div className="flex flex-col items-center gap-6 border-4 border-black bg-[#a78bfa] p-8 text-center shadow-[8px_8px_0px_0px_#000] sm:p-12">
+            <h2 className="text-2xl font-black text-[#1d1a21] sm:text-3xl">Ready to start your first quest?</h2>
+            <p className="max-w-lg text-sm text-[#3b1f7a] sm:text-base">
+              Sign up in a minute, log your first assignment, and watch your level, streak, and badges start filling in.
+            </p>
+            <ActionLink href="/signup" tone="dark" icon={<Icon name="play" className="h-6 w-6" />} className="justify-center text-base sm:text-lg">
+              Create your account
+            </ActionLink>
           </div>
         </section>
 

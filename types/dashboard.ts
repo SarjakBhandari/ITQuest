@@ -17,6 +17,7 @@ export interface WorkloadSegment {
 
 export interface DashboardSummary {
   heroName: string;
+  avatarColor: string | null;
   level: number;
   xp: number;
   xpForNextLevel: number;
@@ -24,6 +25,7 @@ export interface DashboardSummary {
   streak: number;
   freezesAvailable: number;
   overloadPct: number;
+  maxActiveQuests: number;
   workload: WorkloadSegment[];
   priorityQuests: PriorityQuest[];
   weeklyXpPotential: number;
