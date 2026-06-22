@@ -62,7 +62,7 @@ export function GroupsPage() {
       <DashboardSidebar onLogout={handleLogout} />
       <DashboardTopBar title="Groups" />
 
-      <div className="ml-[240px] flex flex-1 flex-col overflow-auto pt-24">
+      <div className="flex flex-1 flex-col overflow-auto pt-20 lg:ml-[240px] lg:pt-24">
         {error ? (
           <p className="border-b-2 border-[#f87171] bg-[#f87171]/10 px-6 py-2 text-sm text-[#fecaca]">{error}</p>
         ) : null}

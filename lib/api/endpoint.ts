@@ -15,5 +15,13 @@ export const apiEndpoints = {
   myGroup: `${baseUrl}/groups/me`,
   groups: `${baseUrl}/groups`,
   joinGroup: `${baseUrl}/groups/join`,
-  leaveGroup: `${baseUrl}/groups/leave`
+  leaveGroup: `${baseUrl}/groups/leave`,
+  myStats: `${baseUrl}/stats/me`,
+  mySettings: `${baseUrl}/settings/me`,
+  updateProfile: `${baseUrl}/settings/profile`,
+  updatePreferences: `${baseUrl}/settings/preferences`,
+  changePassword: `${baseUrl}/settings/password`,
+  notifications: `${baseUrl}/notifications`,
+  markNotificationRead: (id: string) => `${baseUrl}/notifications/${id}/read`,
+  markAllNotificationsRead: `${baseUrl}/notifications/read-all`
 } as const;

@@ -233,7 +233,14 @@ const icons: Record<string, IconRenderer> = {
       <path {...strokeProps} d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
     </>
   ),
-  crown: () => <path fill="currentColor" d="M3 7l4 4 5-6 5 6 4-4-2 11H5L3 7zm2 13h14v2H5v-2z" />
+  crown: () => <path fill="currentColor" d="M3 7l4 4 5-6 5 6 4-4-2 11H5L3 7zm2 13h14v2H5v-2z" />,
+  menu: () => (
+    <>
+      <line {...strokeProps} x1="4" y1="6" x2="20" y2="6" />
+      <line {...strokeProps} x1="4" y1="12" x2="20" y2="12" />
+      <line {...strokeProps} x1="4" y1="18" x2="20" y2="18" />
+    </>
+  )
 };
 
 const fallbackIcon: IconRenderer = () => <circle {...strokeProps} cx="12" cy="12" r="9" />;

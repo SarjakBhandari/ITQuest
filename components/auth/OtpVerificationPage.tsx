@@ -156,7 +156,7 @@ export function OtpVerificationPage() {
           <button className="font-bold text-[#23d97e] hover:underline disabled:opacity-60" disabled={resending} onClick={handleResend} type="button">
             {resending ? 'Sending...' : 'Resend'}
           </button>
-          {' · '}
+          {' - '}
           <Link className="font-bold text-[#a78bfa] hover:underline" href="/signup">
             Back to signup
           </Link>

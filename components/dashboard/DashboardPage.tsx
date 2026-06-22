@@ -19,6 +19,7 @@ import type { TaskCategory } from '../../types/task';
 
 const emptySummary: DashboardSummary = {
   heroName: '',
+  avatarColor: null,
   level: 1,
   xp: 0,
   xpForNextLevel: 500,
@@ -26,6 +27,7 @@ const emptySummary: DashboardSummary = {
   streak: 0,
   freezesAvailable: 0,
   overloadPct: 0,
+  maxActiveQuests: 5,
   workload: [],
   priorityQuests: [],
   weeklyXpPotential: 0
@@ -114,7 +116,7 @@ function WorkloadDonut({ segments }: { segments: WorkloadSegment[] }) {
               fill="none"
               r={r}
               stroke={categoryColors[segment.category]}
-              strokeDasharray={`${dashArray} ${circumference}`}
+              strokeDasharray={`${dashArray} ${circumference - dashArray}`}
               strokeDashoffset={dashOffset}
               strokeWidth="16"
               style={{ transform: 'rotate(-90deg)', transformOrigin: '50px 50px' }}
@@ -243,7 +245,7 @@ export function DashboardPage() {
       <DashboardSidebar onLogout={handleLogout} />
       <DashboardTopBar title="Dashboard" />
 
-      <div className="ml-[240px] flex flex-1 flex-col overflow-auto pt-24">
+      <div className="flex flex-1 flex-col overflow-auto pt-20 lg:ml-[240px] lg:pt-24">
         {error ? (
           <p className="border-b-2 border-[#f87171] bg-[#f87171]/10 px-6 py-2 text-sm text-[#fecaca]">{error}</p>
         ) : null}
