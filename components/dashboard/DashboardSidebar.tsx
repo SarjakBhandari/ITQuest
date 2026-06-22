@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { getDashboardSummary } from '../../lib/api/dashboard';
+import { resolveAvatarColor } from '../../lib/avatar';
 import { siteConfig } from '../../lib/site-config';
 import { dashboardNavItems } from '../../lib/site-content';
 
@@ -21,9 +22,12 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [heroName, setHeroName] = useState('');
+  const [avatarColor, setAvatarColor] = useState<string | null>(null);
   const [level, setLevel] = useState<number | null>(null);
   const [xp, setXp] = useState(0);
   const [xpForNextLevel, setXpForNextLevel] = useState(500);
+
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -33,6 +37,7 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
         .then(({ summary }) => {
           if (cancelled) return;
           setHeroName(summary.heroName);
+          setAvatarColor(summary.avatarColor);
           setLevel(summary.level);
           setXp(summary.xp);
           setXpForNextLevel(summary.xpForNextLevel);
@@ -50,6 +55,18 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
     };
   }, []);
 
+  useEffect(() => {
+    function toggle() {
+      setIsMobileOpen((prev) => !prev);
+    }
+    window.addEventListener('itquest:toggle-sidebar', toggle);
+    return () => window.removeEventListener('itquest:toggle-sidebar', toggle);
+  }, []);
+
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
+
   const handleLogout = () => {
     if (onLogout) {
       onLogout();
@@ -65,7 +82,19 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
   const xpPct = Math.min((xp / xpForNextLevel) * 100, 100);
 
   return (
-    <aside className="fixed left-0 top-0 z-50 flex h-full w-[240px] flex-col overflow-y-auto border-r-4 border-black bg-[#1d1a21]/95 p-4 shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] backdrop-blur-sm">
+    <>
+      {isMobileOpen ? (
+        <div
+          aria-hidden="true"
+          className="fixed inset-0 z-40 bg-black/60 lg:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      ) : null}
+      <aside
+        className={`fixed left-0 top-0 z-50 flex h-full w-[240px] flex-col overflow-y-auto border-r-4 border-black bg-[#1d1a21]/95 p-4 shadow-[4px_0px_0px_0px_rgba(0,0,0,1)] backdrop-blur-sm transition-transform duration-200 lg:translate-x-0 ${
+          isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
       <div className="mb-5 flex items-center gap-2.5 border-b-2 border-[#2a2733] pb-5">
         <AppLogo alt={`${siteConfig.name} logo`} className="border-2 border-black bg-white" sizeClassName="h-9 w-9" />
         <div className="min-w-0">
@@ -74,15 +103,18 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
         </div>
       </div>
 
-      <div className="mb-5 border-2 border-black bg-[#141219] p-3 shadow-[3px_3px_0px_0px_#000]">
+      <Link className="mb-5 block border-2 border-black bg-[#141219] p-3 shadow-[3px_3px_0px_0px_#000] transition-colors hover:bg-[#1a1721]" href="/settings">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden border-2 border-black bg-[#a78bfa] text-[#1d1a21]">
-            <Icon filled name="person" />
+          <div
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden border-2 border-black text-[#1d1a21]"
+            style={{ backgroundColor: heroName ? resolveAvatarColor(heroName, avatarColor) : '#a78bfa' }}
+          >
+            {heroName ? <span className="text-sm font-extrabold">{heroName.charAt(0).toUpperCase()}</span> : <Icon filled name="person" />}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold text-[#e6e0ea]">
               {heroName || 'Loading...'}
-              {level !== null ? ` · Level ${level}` : ''}
+              {level !== null ? ` - Level ${level}` : ''}
             </p>
             <p className="text-[10px] uppercase tracking-wide text-[#cac4d4]">
               {xp} / {xpForNextLevel} XP
@@ -99,7 +131,7 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
         >
           <div className="h-full bg-[#23d97e] transition-all duration-500" style={{ width: `${xpPct}%` }} />
         </div>
-      </div>
+      </Link>
 
       <RetroButton
         className="mb-5 w-full justify-center bg-[#ffc640] font-bold uppercase tracking-wider text-[#261a00]"
@@ -142,5 +174,6 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
         </RetroButton>
       </div>
     </aside>
+    </>
   );
 }
