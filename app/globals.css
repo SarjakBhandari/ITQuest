@@ -9,6 +9,49 @@ body {
   min-height: 100%;
 }
 
+:root,
+[data-theme='violet'] {
+  --theme-accent: #a78bfa;
+  --theme-accent-shadow: #312e81;
+  --theme-accent-soft: #cebdff;
+  --theme-accent-soft-text: #381385;
+}
+
+[data-theme='emerald'] {
+  --theme-accent: #23d97e;
+  --theme-accent-shadow: #065f46;
+  --theme-accent-soft: #b6f5d8;
+  --theme-accent-soft-text: #04341f;
+}
+
+[data-theme='crimson'] {
+  --theme-accent: #f87171;
+  --theme-accent-shadow: #7f1d1d;
+  --theme-accent-soft: #fecaca;
+  --theme-accent-soft-text: #5c1212;
+}
+
+[data-theme='amber'] {
+  --theme-accent: #facc15;
+  --theme-accent-shadow: #78350f;
+  --theme-accent-soft: #fde68a;
+  --theme-accent-soft-text: #4a2a06;
+}
+
+[data-theme='ocean'] {
+  --theme-accent: #60a5fa;
+  --theme-accent-shadow: #1e3a8a;
+  --theme-accent-soft: #bfdbfe;
+  --theme-accent-soft-text: #1e3a5c;
+}
+
+[data-theme='rose'] {
+  --theme-accent: #f472b6;
+  --theme-accent-shadow: #831843;
+  --theme-accent-soft: #fbcfe8;
+  --theme-accent-soft-text: #5c1140;
+}
+
 html {
   background:
     radial-gradient(circle at top, rgba(167, 139, 250, 0.15), transparent 30%),

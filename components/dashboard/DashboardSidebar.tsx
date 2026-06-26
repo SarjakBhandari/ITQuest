@@ -51,6 +51,7 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
           setLevel(summary.level);
           setXp(summary.xp);
           setXpForNextLevel(summary.xpForNextLevel);
+          if (summary.theme) document.documentElement.setAttribute('data-theme', summary.theme);
         })
         .catch(() => {
           /* sidebar still renders without level info */
@@ -158,9 +159,9 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
           return (
             <Link
               key={item.label}
-              className={`flex items-center gap-3 rounded-md border-2 p-3 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#a78bfa] ${
+              className={`flex items-center gap-3 rounded-md border-2 p-3 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--theme-accent)] ${
                 isActive
-                  ? 'border-black bg-[#cebdff] text-[#381385] shadow-[3px_3px_0px_0px_#000]'
+                  ? 'border-black bg-[var(--theme-accent-soft)] text-[var(--theme-accent-soft-text)] shadow-[3px_3px_0px_0px_#000]'
                   : 'border-transparent text-[#cac4d4] hover:border-[#2a2733] hover:bg-[#2b2930]'
               }`}
               href={item.href}
