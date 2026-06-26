@@ -5,7 +5,16 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { getDashboardSummary } from '../../lib/api/dashboard';
 import { getMyGroup } from '../../lib/api/groups';
-import { createTask, deleteTask, listTasks, snoozeTask, updateTask } from '../../lib/api/tasks';
+import {
+  createTask,
+  deleteTask,
+  disableExamMode,
+  enableExamMode,
+  listTasks,
+  snoozeTask,
+  sortTasksByPriority,
+  updateTask
+} from '../../lib/api/tasks';
 import { Icon } from '../ui/Icon';
 import { RetroButton } from '../ui/RetroButton';
 import { useToast } from '../ui/ToastProvider';
@@ -61,6 +70,9 @@ export function KanbanBoard() {
   const [mode, setMode] = useState<QuestMode>('Normal');
   const [groupRank, setGroupRank] = useState<{ groupName: string; rank: number } | null>(null);
   const [activeQuestLimit, setActiveQuestLimit] = useState(5);
+  const [lastTouchedTaskId, setLastTouchedTaskId] = useState<string | null>(null);
+  const [isSorting, setIsSorting] = useState(false);
+  const [isTogglingExamMode, setIsTogglingExamMode] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -93,8 +105,11 @@ export function KanbanBoard() {
 
     async function load() {
       try {
-        const { tasks: fetched } = await listTasks();
-        if (!cancelled) setTasks(fetched);
+        const { tasks: fetched, lastTouchedTaskId: touchedId } = await listTasks();
+        if (!cancelled) {
+          setTasks(fetched);
+          setLastTouchedTaskId(touchedId);
+        }
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to load quests.');
       } finally {

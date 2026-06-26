@@ -83,6 +83,13 @@ export function TaskCard({
         </span>
       ) : null}
 
+      {task.examHibernated ? (
+        <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#60a5fa]">
+          <Icon name="bedtime" className="h-3.5 w-3.5" />
+          Hibernated for Exam Mode
+        </span>
+      ) : null}
+
       <div className="flex items-center justify-between gap-2">
         {isDone ? (
           <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-[#45dfa4]">
