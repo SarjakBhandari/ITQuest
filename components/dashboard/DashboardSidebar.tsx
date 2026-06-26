@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import { getCurrentUser } from '../../lib/api/auth';
 import { getDashboardSummary } from '../../lib/api/dashboard';
 import { resolveAvatarColor } from '../../lib/avatar';
 import { siteConfig } from '../../lib/site-config';
@@ -28,6 +29,15 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
   const [xpForNextLevel, setXpForNextLevel] = useState(500);
 
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    getCurrentUser()
+      .then(({ user }) => setIsAdmin(Boolean(user?.isAdmin)))
+      .catch(() => {
+        /* non-admins simply will not see the admin link */
+      });
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
