@@ -123,6 +123,17 @@ export function KanbanBoard() {
     };
   }, []);
 
+  useEffect(() => {
+    if (isLoading || !lastTouchedTaskId) return;
+
+    const element = document.getElementById(`task-card-${lastTouchedTaskId}`);
+    element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    element?.focus({ preventScroll: true });
+
+    const timeout = setTimeout(() => setLastTouchedTaskId(null), 3500);
+    return () => clearTimeout(timeout);
+  }, [isLoading, lastTouchedTaskId]);
+
   const modeCategory = MODE_CATEGORY_FILTER[mode];
   const visibleTasks = useMemo(
     () => (modeCategory ? tasks.filter((task) => task.category === modeCategory) : tasks),

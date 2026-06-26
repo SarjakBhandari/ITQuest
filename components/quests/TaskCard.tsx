@@ -51,6 +51,7 @@ export function TaskCard({
   return (
     <div
       id={`task-card-${task._id}`}
+      tabIndex={-1}
       draggable={!isDone}
       onDragStart={isDone ? undefined : onDragStart}
       className={`group flex flex-col gap-3 border-2 p-4 shadow-[4px_4px_0px_0px_#000] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#000] ${
