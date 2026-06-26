@@ -29,7 +29,7 @@ export function DashboardTopBar({ title = 'Dashboard' }: DashboardTopBarProps) {
           <Icon name="menu" />
         </button>
         <AppLogo alt={`${siteConfig.name} logo`} className="hidden sm:block" sizeClassName="w-10 h-10" />
-        <h2 className="truncate text-lg font-bold text-[#cebdff] sm:text-2xl">{title}</h2>
+        <h2 className="truncate text-lg font-bold text-[var(--theme-accent-soft)] sm:text-2xl">{title}</h2>
       </div>
       <div className="flex items-center gap-3 sm:gap-6">
         <HelpPanel />

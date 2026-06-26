@@ -19,6 +19,15 @@ export type Achievement = {
   target: number;
   progress: number;
   earned: boolean;
+  rewardXp?: number;
+};
+
+export type PersonalBest = {
+  currentWeekXp: number;
+  bestWeekXp: number;
+  bestWeekLabel: string;
+  delta: number;
+  isNewBest: boolean;
 };
 
 export type UserStats = {
@@ -36,6 +45,7 @@ export type UserStats = {
   bestCategory: CategoryStat | null;
   weeklyCompletions: WeeklyCompletion[];
   achievements: Achievement[];
+  personalBest: PersonalBest;
 };
 
 export type StatsResponse = {

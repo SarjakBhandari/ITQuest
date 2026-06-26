@@ -5,7 +5,16 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { getDashboardSummary } from '../../lib/api/dashboard';
 import { getMyGroup } from '../../lib/api/groups';
-import { createTask, deleteTask, listTasks, snoozeTask, updateTask } from '../../lib/api/tasks';
+import {
+  createTask,
+  deleteTask,
+  disableExamMode,
+  enableExamMode,
+  listTasks,
+  snoozeTask,
+  sortTasksByPriority,
+  updateTask
+} from '../../lib/api/tasks';
 import { Icon } from '../ui/Icon';
 import { RetroButton } from '../ui/RetroButton';
 import { useToast } from '../ui/ToastProvider';
@@ -61,6 +70,9 @@ export function KanbanBoard() {
   const [mode, setMode] = useState<QuestMode>('Normal');
   const [groupRank, setGroupRank] = useState<{ groupName: string; rank: number } | null>(null);
   const [activeQuestLimit, setActiveQuestLimit] = useState(5);
+  const [lastTouchedTaskId, setLastTouchedTaskId] = useState<string | null>(null);
+  const [isSorting, setIsSorting] = useState(false);
+  const [isTogglingExamMode, setIsTogglingExamMode] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -77,10 +89,12 @@ export function KanbanBoard() {
 
     getDashboardSummary()
       .then(({ summary }) => {
-        if (!cancelled) setActiveQuestLimit(summary.maxActiveQuests);
+        if (cancelled) return;
+        setActiveQuestLimit(summary.maxActiveQuests);
+        if (summary.examModeActive) setMode('Exam');
       })
       .catch(() => {
-        /* fall back to the default limit */
+        /* fall back to the default limit and mode */
       });
 
     return () => {
@@ -93,8 +107,11 @@ export function KanbanBoard() {
 
     async function load() {
       try {
-        const { tasks: fetched } = await listTasks();
-        if (!cancelled) setTasks(fetched);
+        const { tasks: fetched, lastTouchedTaskId: touchedId } = await listTasks();
+        if (!cancelled) {
+          setTasks(fetched);
+          setLastTouchedTaskId(touchedId);
+        }
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to load quests.');
       } finally {
@@ -107,6 +124,17 @@ export function KanbanBoard() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (isLoading || !lastTouchedTaskId) return;
+
+    const element = document.getElementById(`task-card-${lastTouchedTaskId}`);
+    element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    element?.focus({ preventScroll: true });
+
+    const timeout = setTimeout(() => setLastTouchedTaskId(null), 3500);
+    return () => clearTimeout(timeout);
+  }, [isLoading, lastTouchedTaskId]);
 
   const modeCategory = MODE_CATEGORY_FILTER[mode];
   const visibleTasks = useMemo(
@@ -259,6 +287,52 @@ export function KanbanBoard() {
     }
   }
 
+  async function handleModeChange(nextMode: QuestMode) {
+    if (nextMode === mode) return;
+    const wasExam = mode === 'Exam';
+    const isExam = nextMode === 'Exam';
+    setMode(nextMode);
+
+    if (!wasExam && isExam) {
+      setIsTogglingExamMode(true);
+      try {
+        const { message } = await enableExamMode();
+        const { tasks: fetched } = await listTasks();
+        setTasks(fetched);
+        showToast(message, 'info');
+      } catch (err) {
+        showToast(err instanceof Error ? err.message : 'Unable to enable exam mode.', 'error');
+      } finally {
+        setIsTogglingExamMode(false);
+      }
+    } else if (wasExam && !isExam) {
+      setIsTogglingExamMode(true);
+      try {
+        const { message } = await disableExamMode();
+        const { tasks: fetched } = await listTasks();
+        setTasks(fetched);
+        showToast(message, 'success');
+      } catch (err) {
+        showToast(err instanceof Error ? err.message : 'Unable to disable exam mode.', 'error');
+      } finally {
+        setIsTogglingExamMode(false);
+      }
+    }
+  }
+
+  async function handleSortByPriority() {
+    setIsSorting(true);
+    try {
+      const { tasks: sorted } = await sortTasksByPriority();
+      setTasks(sorted);
+      showToast('Quests sorted by priority.', 'success');
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Unable to sort quests.', 'error');
+    } finally {
+      setIsSorting(false);
+    }
+  }
+
   async function handleDrop(status: TaskStatus) {
     setDragOverStatus(null);
     if (!draggedTaskId) return;
@@ -303,10 +377,30 @@ export function KanbanBoard() {
           <h2 className="text-lg font-extrabold text-white">Your Quest Board</h2>
           <p className="text-xs text-[#6b7280]">
             {tasks.length} total quest{tasks.length === 1 ? '' : 's'} tracked
+            {mode === 'Exam' ? ' - other quests are hibernated' : ''}
           </p>
         </div>
-        <ModeSelector compact mode={mode} onChange={setMode} />
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            className="flex items-center gap-1.5 border-2 border-black bg-[#1e1c24] px-3 py-2 text-xs font-bold uppercase tracking-wide text-[#cac4d4] transition-all hover:bg-[#2b2930] disabled:opacity-60"
+            disabled={isSorting}
+            onClick={handleSortByPriority}
+            title="Sort every column by priority"
+            type="button"
+          >
+            <Icon className={`h-4 w-4 ${isSorting ? 'animate-spin' : ''}`} name={isSorting ? 'schedule' : 'trending_up'} />
+            Sort by Priority
+          </button>
+          <ModeSelector compact mode={mode} onChange={handleModeChange} />
+        </div>
       </div>
+
+      {isTogglingExamMode ? (
+        <div className="flex items-center gap-2 border-b-2 border-[#2a2733] bg-[#1a1827] px-4 py-2 text-xs text-[#9ca3af] sm:px-6">
+          <Icon className="h-3.5 w-3.5 animate-spin" name="schedule" />
+          {mode === 'Exam' ? 'Hibernating other quests...' : 'Resuming hibernated quests...'}
+        </div>
+      ) : null}
 
       <section className="flex-1 overflow-x-auto p-4 sm:p-6">
         {isLoading ? (
@@ -376,6 +470,7 @@ export function KanbanBoard() {
                       <TaskCard
                         key={task._id}
                         task={task}
+                        isHighlighted={task._id === lastTouchedTaskId}
                         onDragStart={(event) => {
                           event.dataTransfer.setData('text/plain', task._id);
                           setDraggedTaskId(task._id);

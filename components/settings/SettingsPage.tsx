@@ -7,6 +7,7 @@ import { logout } from '../../lib/api/auth';
 import { changePassword, getMySettings, updatePreferences, updateProfile } from '../../lib/api/settings';
 import { getMyStats } from '../../lib/api/stats';
 import { AVATAR_COLORS, resolveAvatarColor } from '../../lib/avatar';
+import { THEME_OPTIONS } from '../../lib/theme';
 import { DashboardSidebar } from '../dashboard/DashboardSidebar';
 import { DashboardTopBar } from '../dashboard/DashboardTopBar';
 import { Icon } from '../ui/Icon';
@@ -48,6 +49,7 @@ export function SettingsPage() {
 
   const [maxActiveQuestsInput, setMaxActiveQuestsInput] = useState(5);
   const [emailNudgesInput, setEmailNudgesInput] = useState(true);
+  const [weeklyXpTargetInput, setWeeklyXpTargetInput] = useState(0);
   const [isSavingPreferences, setIsSavingPreferences] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState('');
@@ -66,6 +68,7 @@ export function SettingsPage() {
         setHeroNameInput(fetched.heroName);
         setMaxActiveQuestsInput(fetched.maxActiveQuests);
         setEmailNudgesInput(fetched.emailNudgesEnabled);
+        setWeeklyXpTargetInput(fetched.weeklyXpTarget);
       })
       .catch((err) => {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to load your settings.');
@@ -120,12 +123,29 @@ export function SettingsPage() {
     }
   };
 
+  const pickTheme = async (themeId: string) => {
+    if (!settings) return;
+    const previousTheme = settings.theme;
+    document.documentElement.setAttribute('data-theme', themeId);
+    setSettings({ ...settings, theme: themeId });
+    try {
+      const { settings: updated } = await updateProfile({ theme: themeId });
+      setSettings(updated);
+      showToast('Theme updated.', 'success');
+    } catch (err) {
+      document.documentElement.setAttribute('data-theme', previousTheme);
+      setSettings({ ...settings, theme: previousTheme });
+      showToast(err instanceof Error ? err.message : 'Unable to update theme.', 'error');
+    }
+  };
+
   const savePreferences = async () => {
     setIsSavingPreferences(true);
     try {
       const { settings: updated } = await updatePreferences({
         maxActiveQuests: maxActiveQuestsInput,
-        emailNudgesEnabled: emailNudgesInput
+        emailNudgesEnabled: emailNudgesInput,
+        weeklyXpTarget: weeklyXpTargetInput
       });
       setSettings(updated);
       showToast('Preferences updated.', 'success');
@@ -176,7 +196,7 @@ export function SettingsPage() {
         ) : (
           <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
             <section
-              className="flex flex-wrap items-center gap-6 border-2 border-[#a78bfa] bg-[#1e1c24] p-6 shadow-[6px_6px_0px_0px_#000]"
+              className="flex flex-wrap items-center gap-6 border-2 border-[var(--theme-accent)] bg-[#1e1c24] p-6 shadow-[6px_6px_0px_0px_#000]"
               aria-label="Profile overview"
             >
               <div
@@ -258,6 +278,36 @@ export function SettingsPage() {
               <p className="mt-2 text-xs text-gray-500">{settings.email}</p>
             </SettingsCard>
 
+            <SettingsCard icon="sparkle" title="Appearance">
+              <p className="mb-4 text-sm text-gray-400">
+                Pick an accent theme for the sidebar, navigation, and key cards across the app.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {THEME_OPTIONS.map((theme) => (
+                  <button
+                    key={theme.id}
+                    aria-label={`Use ${theme.label} theme`}
+                    aria-pressed={settings.theme === theme.id}
+                    className="flex w-24 flex-col items-center gap-2 border-2 p-3 transition-transform hover:scale-105"
+                    onClick={() => pickTheme(theme.id)}
+                    style={{
+                      borderColor: settings.theme === theme.id ? theme.swatch : '#3f3d46',
+                      backgroundColor: settings.theme === theme.id ? '#2a2733' : '#1a1827'
+                    }}
+                    type="button"
+                  >
+                    <span className="h-8 w-8 border-2 border-black" style={{ backgroundColor: theme.swatch }} />
+                    <span
+                      className="text-xs font-bold uppercase tracking-wide"
+                      style={{ color: settings.theme === theme.id ? theme.swatch : '#9ca3af' }}
+                    >
+                      {theme.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </SettingsCard>
+
             <SettingsCard icon="warning" title="Overload Threshold">
               <p className="mb-4 text-sm text-gray-400">
                 The Quest Board and Dashboard flag you as overloaded once your active (In Progress) quests pass this
@@ -300,6 +350,22 @@ export function SettingsPage() {
                     style={{ transform: emailNudgesInput ? 'translateX(28px)' : 'translateX(2px)' }}
                   />
                 </button>
+              </div>
+
+              <div className="mt-6 border-t-2 border-[#2a2733] pt-5">
+                <p className="text-sm font-bold text-white">Weekly XP target</p>
+                <p className="mb-3 text-xs text-gray-500">
+                  Set a goal for XP earned per week. We&apos;ll email you at 75% and 100% progress. Set to 0 to disable.
+                </p>
+                <input
+                  aria-label="Weekly XP target"
+                  className="w-full border-2 border-[#3f3d46] bg-[#2a2733] px-4 py-3 text-white placeholder-gray-600 focus:border-[#a78bfa] focus:outline-none"
+                  min={0}
+                  max={100000}
+                  onChange={(event) => setWeeklyXpTargetInput(Number(event.target.value))}
+                  type="number"
+                  value={weeklyXpTargetInput}
+                />
               </div>
 
               <button

@@ -27,3 +27,15 @@ export async function deleteTask(id: string): Promise<{ ok: boolean; message: st
 export async function snoozeTask(id: string): Promise<TaskResponse> {
   return apiRequest<TaskResponse>(apiEndpoints.snoozeTask(id), { method: 'POST' });
 }
+
+export async function sortTasksByPriority(): Promise<TaskListResponse> {
+  return apiRequest<TaskListResponse>(apiEndpoints.sortTasksByPriority, { method: 'POST' });
+}
+
+export async function enableExamMode(): Promise<{ ok: boolean; message: string }> {
+  return apiRequest(apiEndpoints.enableExamMode, { method: 'POST' });
+}
+
+export async function disableExamMode(): Promise<{ ok: boolean; message: string }> {
+  return apiRequest(apiEndpoints.disableExamMode, { method: 'POST' });
+}

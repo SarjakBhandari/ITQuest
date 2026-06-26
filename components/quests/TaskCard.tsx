@@ -29,9 +29,20 @@ type TaskCardProps = {
   onResume: () => void;
   onComplete: () => void;
   onSnooze: () => void;
+  isHighlighted?: boolean;
 };
 
-export function TaskCard({ task, onEdit, onDelete, onDragStart, onPause, onResume, onComplete, onSnooze }: TaskCardProps) {
+export function TaskCard({
+  task,
+  onEdit,
+  onDelete,
+  onDragStart,
+  onPause,
+  onResume,
+  onComplete,
+  onSnooze,
+  isHighlighted
+}: TaskCardProps) {
   const priority = priorityStyles[task.priority];
   const dueLabel = formatDueIn(task.dueDate);
   const isDone = task.status === 'done';
@@ -39,9 +50,13 @@ export function TaskCard({ task, onEdit, onDelete, onDragStart, onPause, onResum
 
   return (
     <div
+      id={`task-card-${task._id}`}
+      tabIndex={-1}
       draggable={!isDone}
       onDragStart={isDone ? undefined : onDragStart}
       className={`group flex flex-col gap-3 border-2 p-4 shadow-[4px_4px_0px_0px_#000] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#000] ${
+        isHighlighted ? 'ring-4 ring-[var(--theme-accent)] ring-offset-2 ring-offset-[#0f0f13]' : ''
+      } ${
         isDone
           ? 'border-black bg-[#1e1c24] opacity-70 grayscale hover:opacity-100 hover:grayscale-0'
           : isOverdue
@@ -66,6 +81,13 @@ export function TaskCard({ task, onEdit, onDelete, onDragStart, onPause, onResum
         <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#f87171]">
           <Icon name="warning" className="h-3.5 w-3.5" />
           Overdue
+        </span>
+      ) : null}
+
+      {task.examHibernated ? (
+        <span className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#60a5fa]">
+          <Icon name="bedtime" className="h-3.5 w-3.5" />
+          Hibernated for Exam Mode
         </span>
       ) : null}
 

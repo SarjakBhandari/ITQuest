@@ -18,6 +18,8 @@ export interface WorkloadSegment {
 export interface DashboardSummary {
   heroName: string;
   avatarColor: string | null;
+  theme: string;
+  examModeActive: boolean;
   level: number;
   xp: number;
   xpForNextLevel: number;

@@ -20,6 +20,8 @@ import type { TaskCategory } from '../../types/task';
 const emptySummary: DashboardSummary = {
   heroName: '',
   avatarColor: null,
+  theme: 'violet',
+  examModeActive: false,
   level: 1,
   xp: 0,
   xpForNextLevel: 500,
@@ -252,9 +254,9 @@ export function DashboardPage() {
 
         <main aria-label="Dashboard content" className="grid flex-1 grid-cols-1 gap-6 p-6 lg:grid-cols-3">
           <div className="flex flex-col gap-6 lg:col-span-2">
-            <RetroCard borderColor="#a78bfa">
+            <RetroCard borderColor="var(--theme-accent)">
               {summary.heroName ? (
-                <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[#a78bfa]">{summary.heroName}</p>
+                <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[var(--theme-accent)]">{summary.heroName}</p>
               ) : null}
               <div className="flex items-center gap-4">
                 <span className="whitespace-nowrap text-lg font-extrabold text-white">Level {summary.level}</span>
@@ -374,13 +376,13 @@ export function DashboardPage() {
               <WorkloadDonut segments={summary.workload} />
             </RetroCard>
 
-            <RetroCard borderColor="#a78bfa" className="bg-[#a78bfa]">
+            <RetroCard borderColor="var(--theme-accent)" className="bg-[var(--theme-accent)] text-[var(--theme-accent-soft-text)]">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-widest text-[#3b1f7a]">Weekly XP Potential</span>
+                <span className="text-xs font-bold uppercase tracking-widest">Weekly XP Potential</span>
                 <TrendUpIcon />
               </div>
               <p className="mb-2 text-4xl font-extrabold text-[#0f0f13]">+{summary.weeklyXpPotential} XP</p>
-              <p className="text-sm text-[#3b1f7a]">
+              <p className="text-sm">
                 {summary.priorityQuests.length === 0
                   ? 'No quests for now! You can earn your XP simply by logging in!'
                   : 'Complete your active quests this week to bank this XP.'}
