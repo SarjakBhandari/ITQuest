@@ -7,6 +7,7 @@ import { logout } from '../../lib/api/auth';
 import { changePassword, getMySettings, updatePreferences, updateProfile } from '../../lib/api/settings';
 import { getMyStats } from '../../lib/api/stats';
 import { AVATAR_COLORS, resolveAvatarColor } from '../../lib/avatar';
+import { THEME_OPTIONS } from '../../lib/theme';
 import { DashboardSidebar } from '../dashboard/DashboardSidebar';
 import { DashboardTopBar } from '../dashboard/DashboardTopBar';
 import { Icon } from '../ui/Icon';
@@ -120,6 +121,22 @@ export function SettingsPage() {
     }
   };
 
+  const pickTheme = async (themeId: string) => {
+    if (!settings) return;
+    const previousTheme = settings.theme;
+    document.documentElement.setAttribute('data-theme', themeId);
+    setSettings({ ...settings, theme: themeId });
+    try {
+      const { settings: updated } = await updateProfile({ theme: themeId });
+      setSettings(updated);
+      showToast('Theme updated.', 'success');
+    } catch (err) {
+      document.documentElement.setAttribute('data-theme', previousTheme);
+      setSettings({ ...settings, theme: previousTheme });
+      showToast(err instanceof Error ? err.message : 'Unable to update theme.', 'error');
+    }
+  };
+
   const savePreferences = async () => {
     setIsSavingPreferences(true);
     try {
@@ -176,7 +193,7 @@ export function SettingsPage() {
         ) : (
           <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-6">
             <section
-              className="flex flex-wrap items-center gap-6 border-2 border-[#a78bfa] bg-[#1e1c24] p-6 shadow-[6px_6px_0px_0px_#000]"
+              className="flex flex-wrap items-center gap-6 border-2 border-[var(--theme-accent)] bg-[#1e1c24] p-6 shadow-[6px_6px_0px_0px_#000]"
               aria-label="Profile overview"
             >
               <div
@@ -256,6 +273,36 @@ export function SettingsPage() {
                 </button>
               </div>
               <p className="mt-2 text-xs text-gray-500">{settings.email}</p>
+            </SettingsCard>
+
+            <SettingsCard icon="sparkle" title="Appearance">
+              <p className="mb-4 text-sm text-gray-400">
+                Pick an accent theme for the sidebar, navigation, and key cards across the app.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {THEME_OPTIONS.map((theme) => (
+                  <button
+                    key={theme.id}
+                    aria-label={`Use ${theme.label} theme`}
+                    aria-pressed={settings.theme === theme.id}
+                    className="flex w-24 flex-col items-center gap-2 border-2 p-3 transition-transform hover:scale-105"
+                    onClick={() => pickTheme(theme.id)}
+                    style={{
+                      borderColor: settings.theme === theme.id ? theme.swatch : '#3f3d46',
+                      backgroundColor: settings.theme === theme.id ? '#2a2733' : '#1a1827'
+                    }}
+                    type="button"
+                  >
+                    <span className="h-8 w-8 border-2 border-black" style={{ backgroundColor: theme.swatch }} />
+                    <span
+                      className="text-xs font-bold uppercase tracking-wide"
+                      style={{ color: settings.theme === theme.id ? theme.swatch : '#9ca3af' }}
+                    >
+                      {theme.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </SettingsCard>
 
             <SettingsCard icon="warning" title="Overload Threshold">

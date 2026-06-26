@@ -2,6 +2,7 @@ export type UserSettings = {
   heroName: string;
   email: string;
   avatarColor: string | null;
+  theme: string;
   maxActiveQuests: number;
   emailNudgesEnabled: boolean;
 };
