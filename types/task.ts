@@ -18,6 +18,7 @@ export interface Task {
   pausedAt: string | null;
   snoozeCount: number;
   isOverdue: boolean;
+  examHibernated: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -26,6 +27,7 @@ export interface TaskListResponse {
   ok: boolean;
   message?: string;
   tasks: Task[];
+  lastTouchedTaskId: string | null;
 }
 
 export interface TaskResponse {
