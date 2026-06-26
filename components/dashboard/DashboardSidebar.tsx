@@ -153,7 +153,7 @@ export function DashboardSidebar({ onLogout }: DashboardSidebarProps) {
       </RetroButton>
 
       <nav className="flex flex-1 flex-col gap-1.5" aria-label="Main navigation">
-        {dashboardNavItems.map((item) => {
+        {[...dashboardNavItems, ...(isAdmin ? [{ label: 'Admin', href: '/admin' as const, icon: 'shield' }] : [])].map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link
