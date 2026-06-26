@@ -314,6 +314,8 @@ export function StatsPage() {
             </div>
 
             <div className="flex flex-col gap-6">
+              <PersonalBestCard personalBest={stats.personalBest} />
+
               <StatCard borderColor="#2a2733">
                 <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-gray-400">XP by Category</h2>
                 <CategoryDonut categories={stats.categoryBreakdown} />
