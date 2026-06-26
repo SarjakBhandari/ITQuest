@@ -6,6 +6,7 @@ import { siteConfig } from '../../lib/site-config';
 
 import { AppLogo } from '../../components/ui/AppLogo';
 
+import { HelpPanel } from '../../components/ui/HelpPanel';
 import { Icon } from '../../components/ui/Icon';
 import { NotificationBell } from '../../components/ui/NotificationBell';
 
@@ -31,6 +32,7 @@ export function DashboardTopBar({ title = 'Dashboard' }: DashboardTopBarProps) {
         <h2 className="truncate text-lg font-bold text-[#cebdff] sm:text-2xl">{title}</h2>
       </div>
       <div className="flex items-center gap-3 sm:gap-6">
+        <HelpPanel />
         <NotificationBell />
         <button
           aria-label="Profile and settings"
