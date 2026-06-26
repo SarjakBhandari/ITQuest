@@ -285,6 +285,52 @@ export function KanbanBoard() {
     }
   }
 
+  async function handleModeChange(nextMode: QuestMode) {
+    if (nextMode === mode) return;
+    const wasExam = mode === 'Exam';
+    const isExam = nextMode === 'Exam';
+    setMode(nextMode);
+
+    if (!wasExam && isExam) {
+      setIsTogglingExamMode(true);
+      try {
+        const { message } = await enableExamMode();
+        const { tasks: fetched } = await listTasks();
+        setTasks(fetched);
+        showToast(message, 'info');
+      } catch (err) {
+        showToast(err instanceof Error ? err.message : 'Unable to enable exam mode.', 'error');
+      } finally {
+        setIsTogglingExamMode(false);
+      }
+    } else if (wasExam && !isExam) {
+      setIsTogglingExamMode(true);
+      try {
+        const { message } = await disableExamMode();
+        const { tasks: fetched } = await listTasks();
+        setTasks(fetched);
+        showToast(message, 'success');
+      } catch (err) {
+        showToast(err instanceof Error ? err.message : 'Unable to disable exam mode.', 'error');
+      } finally {
+        setIsTogglingExamMode(false);
+      }
+    }
+  }
+
+  async function handleSortByPriority() {
+    setIsSorting(true);
+    try {
+      const { tasks: sorted } = await sortTasksByPriority();
+      setTasks(sorted);
+      showToast('Quests sorted by priority.', 'success');
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Unable to sort quests.', 'error');
+    } finally {
+      setIsSorting(false);
+    }
+  }
+
   async function handleDrop(status: TaskStatus) {
     setDragOverStatus(null);
     if (!draggedTaskId) return;
@@ -402,6 +448,7 @@ export function KanbanBoard() {
                       <TaskCard
                         key={task._id}
                         task={task}
+                        isHighlighted={task._id === lastTouchedTaskId}
                         onDragStart={(event) => {
                           event.dataTransfer.setData('text/plain', task._id);
                           setDraggedTaskId(task._id);
