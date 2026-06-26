@@ -240,6 +240,13 @@ const icons: Record<string, IconRenderer> = {
       <line {...strokeProps} x1="4" y1="12" x2="20" y2="12" />
       <line {...strokeProps} x1="4" y1="18" x2="20" y2="18" />
     </>
+  ),
+  help: () => (
+    <>
+      <circle {...strokeProps} cx="12" cy="12" r="9" />
+      <path {...strokeProps} d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7v.5" />
+      <line {...strokeProps} strokeWidth={3} x1="12" y1="17" x2="12" y2="17.01" />
+    </>
   )
 };
 
