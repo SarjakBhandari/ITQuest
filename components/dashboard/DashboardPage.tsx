@@ -21,6 +21,7 @@ const emptySummary: DashboardSummary = {
   heroName: '',
   avatarColor: null,
   theme: 'violet',
+  examModeActive: false,
   level: 1,
   xp: 0,
   xpForNextLevel: 500,

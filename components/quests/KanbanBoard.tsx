@@ -89,10 +89,12 @@ export function KanbanBoard() {
 
     getDashboardSummary()
       .then(({ summary }) => {
-        if (!cancelled) setActiveQuestLimit(summary.maxActiveQuests);
+        if (cancelled) return;
+        setActiveQuestLimit(summary.maxActiveQuests);
+        if (summary.examModeActive) setMode('Exam');
       })
       .catch(() => {
-        /* fall back to the default limit */
+        /* fall back to the default limit and mode */
       });
 
     return () => {
