@@ -1,4 +1,4 @@
-export type RoutePath = '/' | '/login' | '/signup' | '/otp-signup' | '/dashboard' | '/quests' | '/groups' | '/stats' | '/settings';
+export type RoutePath = '/' | '/login' | '/signup' | '/otp-signup' | '/dashboard' | '/quests' | '/groups' | '/stats' | '/settings' | '/admin';
 
 export interface DashboardNavItem {
   label: string;
