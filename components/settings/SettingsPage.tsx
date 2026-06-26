@@ -49,6 +49,7 @@ export function SettingsPage() {
 
   const [maxActiveQuestsInput, setMaxActiveQuestsInput] = useState(5);
   const [emailNudgesInput, setEmailNudgesInput] = useState(true);
+  const [weeklyXpTargetInput, setWeeklyXpTargetInput] = useState(0);
   const [isSavingPreferences, setIsSavingPreferences] = useState(false);
 
   const [currentPassword, setCurrentPassword] = useState('');
@@ -67,6 +68,7 @@ export function SettingsPage() {
         setHeroNameInput(fetched.heroName);
         setMaxActiveQuestsInput(fetched.maxActiveQuests);
         setEmailNudgesInput(fetched.emailNudgesEnabled);
+        setWeeklyXpTargetInput(fetched.weeklyXpTarget);
       })
       .catch((err) => {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to load your settings.');
@@ -142,7 +144,8 @@ export function SettingsPage() {
     try {
       const { settings: updated } = await updatePreferences({
         maxActiveQuests: maxActiveQuestsInput,
-        emailNudgesEnabled: emailNudgesInput
+        emailNudgesEnabled: emailNudgesInput,
+        weeklyXpTarget: weeklyXpTargetInput
       });
       setSettings(updated);
       showToast('Preferences updated.', 'success');
@@ -347,6 +350,22 @@ export function SettingsPage() {
                     style={{ transform: emailNudgesInput ? 'translateX(28px)' : 'translateX(2px)' }}
                   />
                 </button>
+              </div>
+
+              <div className="mt-6 border-t-2 border-[#2a2733] pt-5">
+                <p className="text-sm font-bold text-white">Weekly XP target</p>
+                <p className="mb-3 text-xs text-gray-500">
+                  Set a goal for XP earned per week. We&apos;ll email you at 75% and 100% progress. Set to 0 to disable.
+                </p>
+                <input
+                  aria-label="Weekly XP target"
+                  className="w-full border-2 border-[#3f3d46] bg-[#2a2733] px-4 py-3 text-white placeholder-gray-600 focus:border-[#a78bfa] focus:outline-none"
+                  min={0}
+                  max={100000}
+                  onChange={(event) => setWeeklyXpTargetInput(Number(event.target.value))}
+                  type="number"
+                  value={weeklyXpTargetInput}
+                />
               </div>
 
               <button

@@ -5,6 +5,7 @@ export type UserSettings = {
   theme: string;
   maxActiveQuests: number;
   emailNudgesEnabled: boolean;
+  weeklyXpTarget: number;
 };
 
 export type SettingsResponse = {

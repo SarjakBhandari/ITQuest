@@ -20,6 +20,7 @@ export async function updateProfile(input: {
 export async function updatePreferences(input: {
   maxActiveQuests?: number;
   emailNudgesEnabled?: boolean;
+  weeklyXpTarget?: number;
 }): Promise<SettingsResponse> {
   return apiRequest<SettingsResponse>(apiEndpoints.updatePreferences, {
     method: 'PATCH',
