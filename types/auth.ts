@@ -22,6 +22,7 @@ export interface AuthResponseDto {
 export interface AuthUserDto {
   heroName: string;
   email: string;
+  isAdmin?: boolean;
 }
 
 export interface LoginResponseDto extends AuthResponseDto {

@@ -23,5 +23,13 @@ export const apiEndpoints = {
   changePassword: `${baseUrl}/settings/password`,
   notifications: `${baseUrl}/notifications`,
   markNotificationRead: (id: string) => `${baseUrl}/notifications/${id}/read`,
-  markAllNotificationsRead: `${baseUrl}/notifications/read-all`
+  markAllNotificationsRead: `${baseUrl}/notifications/read-all`,
+  adminOverview: `${baseUrl}/admin/overview`,
+  adminUsers: (search?: string) => `${baseUrl}/admin/users${search ? `?search=${encodeURIComponent(search)}` : ''}`,
+  adminUser: (id: string) => `${baseUrl}/admin/users/${id}`,
+  adminUserSuspension: (id: string) => `${baseUrl}/admin/users/${id}/suspension`,
+  adminGuilds: `${baseUrl}/admin/guilds`,
+  adminGuild: (id: string) => `${baseUrl}/admin/guilds/${id}`,
+  adminGuildMember: (guildId: string, memberId: string) => `${baseUrl}/admin/guilds/${guildId}/members/${memberId}`,
+  adminAnnouncements: `${baseUrl}/admin/announcements`
 } as const;
