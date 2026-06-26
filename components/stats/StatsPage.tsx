@@ -142,9 +142,53 @@ function AchievementCard({ achievement }: { achievement: UserStats['achievements
         </div>
         <p className="mt-1 text-[10px] uppercase tracking-widest text-[#6b7280]">
           {achievement.progress} / {achievement.target}
+          {achievement.rewardXp ? ` - +${achievement.rewardXp} XP reward` : ''}
         </p>
       </div>
     </div>
+  );
+}
+
+function PersonalBestCard({ personalBest }: { personalBest: UserStats['personalBest'] }) {
+  const max = Math.max(1, personalBest.currentWeekXp, personalBest.bestWeekXp);
+  const currentPct = Math.round((personalBest.currentWeekXp / max) * 100);
+  const bestPct = Math.round((personalBest.bestWeekXp / max) * 100);
+
+  return (
+    <StatCard borderColor={personalBest.isNewBest ? '#facc15' : '#2a2733'}>
+      <h2 className="mb-4 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400">
+        <Icon className="h-4 w-4" name="trending_up" style={{ color: '#facc15' }} />
+        Personal Best
+      </h2>
+
+      <div className="mb-3">
+        <div className="mb-1 flex items-center justify-between text-xs">
+          <span className="font-bold text-white">This Week</span>
+          <span className="font-bold text-[#23d97e]">{personalBest.currentWeekXp.toLocaleString()} XP</span>
+        </div>
+        <div className="h-3 w-full overflow-hidden border border-black bg-[#0f0f13]">
+          <div className="h-full bg-[#23d97e] transition-all duration-500" style={{ width: `${currentPct}%` }} />
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <div className="mb-1 flex items-center justify-between text-xs">
+          <span className="text-gray-400">{personalBest.bestWeekLabel}</span>
+          <span className="font-bold text-[#facc15]">{personalBest.bestWeekXp.toLocaleString()} XP</span>
+        </div>
+        <div className="h-3 w-full overflow-hidden border border-black bg-[#0f0f13]">
+          <div className="h-full bg-[#facc15] transition-all duration-500" style={{ width: `${bestPct}%` }} />
+        </div>
+      </div>
+
+      {personalBest.isNewBest ? (
+        <p className="text-xs font-bold text-[#facc15]">New personal best! +{personalBest.delta.toLocaleString()} XP ahead.</p>
+      ) : personalBest.bestWeekXp > 0 ? (
+        <p className="text-xs text-gray-400">{Math.abs(personalBest.delta).toLocaleString()} XP behind your best week.</p>
+      ) : (
+        <p className="text-xs text-gray-400">Complete quests this week to set your first record.</p>
+      )}
+    </StatCard>
   );
 }
 
